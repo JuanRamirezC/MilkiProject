@@ -5,7 +5,7 @@ import java.sql.SQLException;
 public class Principal {
 
 	public static void main(String[] args) throws SQLException, IOException {
-		Empresa.conectar();
+		Empresa.conectar("milki","12");
 		
 //		Empresa.anadirCliente("51478798N", "Joel", "Narvaez", 642574885, "Calle Ffdrhtdh", 25022);
 //		Empresa.borrarCliente(null);
@@ -31,9 +31,9 @@ public class Principal {
 //		Empresa.verArticulosPedido(12);
 //		Empresa.verArticulosPedido(1);	
 //		Empresa.cancelarPedido(1);		
-		Empresa.finalizarPedido(2);
+//		Empresa.finalizarPedido(9);
 //		Empresa.confirmarPedido(2);
-//		Empresa.generarFactura(6);
+//		Empresa.generarFactura(9);
 	}
 	
 
