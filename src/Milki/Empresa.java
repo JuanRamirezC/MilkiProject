@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -126,8 +127,7 @@ public class Empresa {
 	 * @param number    Indica el numero del cliente.
 	 * @param dir       Indica la direccion del cliente.
 	 * @param postal    Indica la postal del cliente.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void anadirCliente(String dni, String nombre, String apellidos, int number, String dir, int postal)
 			throws SQLException {
@@ -162,8 +162,7 @@ public class Empresa {
 	 * 
 	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la
 	 *               base de datos y borrarlo.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void borrarPersona(String codigo) throws SQLException {
 
@@ -190,8 +189,7 @@ public class Empresa {
 	 * 
 	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la
 	 *               base de datos y hacer una consulta especifica.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void mostrarPedidos(String codigo) throws SQLException {
 		int num_pedido;
@@ -200,18 +198,20 @@ public class Empresa {
 		String estado;
 
 		st = connection.createStatement();
-		rs = st.executeQuery("select num_pedido, importe_total, fecha_pedido, estado from pedido where cod_persona='"
-				+ codigo + "'");
-		if (!rs.next()) {
-			System.out.println("No hay pedidos para el cliente o el proveedor de cliente");
+		rs = st.executeQuery("select num_pedido, importe_total, fecha_pedido, estado from pedido where cod_persona='"+codigo+"'");
+		if (rs.next()) {
+			do {
+				num_pedido = rs.getInt("num_pedido");
+				importe_total = rs.getDouble("importe_total");
+				fecha = rs.getDate("fecha_pedido");
+				estado = rs.getString("estado");
+				System.out.println("Pedido numero: " + num_pedido + "	Importe total: " + importe_total + "	Fecha: "
+				+ fecha + "	Estado: " + estado);
+			
+			}while (rs.next());	
 		}
-		while (rs.next()) {
-			num_pedido = rs.getInt("num_pedido");
-			importe_total = rs.getDouble("importe_total");
-			fecha = rs.getDate("fecha_pedido");
-			estado = rs.getString("estado");
-			System.out.println("Pedido numero: " + num_pedido + "	Importe total: " + importe_total + "	Fecha: "
-					+ fecha + "	Estado: " + estado);
+		else {
+			System.out.println("No hay pedidos para el cliente o el proveedor de cliente");
 		}
 	}
 
@@ -227,8 +227,7 @@ public class Empresa {
 	 * @param number Numero de de la empresa o del autonomo.
 	 * @param dir    Direccion de la empresa o del autonomo.
 	 * @param postal Codigo postal de de la empresa o del autonomo.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void anadirProv(String dni, String nombre, int number, String dir, int postal) throws SQLException {
 
@@ -262,8 +261,7 @@ public class Empresa {
 	/**
 	 * Metodo que muestra todos los productos que tenemos en el almacen.
 	 * 
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void verProductos() throws SQLException {
 		int codigo_producto, cant;
@@ -276,7 +274,7 @@ public class Empresa {
 		if (!rs.next()) {
 			System.out.println("No hay productos en el almacén");
 		}
-		while (rs.next()) {
+		do {
 			codigo_producto = rs.getInt("codigo_prod");
 			nombre = rs.getString("nombre");
 			cant = rs.getInt("cantidad");
@@ -286,7 +284,8 @@ public class Empresa {
 			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
 					+ "	Descripcion: " + descripcion + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
 					+ precio_venta);
-		}
+		} while (rs.next());
+	
 	}
 
 	/**
@@ -297,8 +296,7 @@ public class Empresa {
 	 * 
 	 * @param nombreProd Nombre de un producto para buscar similitudes en nuestra de
 	 *                   base de datos
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void verProductoNombre(String nombreProd) throws SQLException {
 		int codigo_producto, cant;
@@ -312,7 +310,7 @@ public class Empresa {
 		if (!rs.next()) {
 			System.out.println("No hay productos en el almacén");
 		}
-		while (rs.next()) {
+		do {
 			codigo_producto = rs.getInt("codigo_prod");
 			nombre = rs.getString("nombre");
 			cant = rs.getInt("cantidad");
@@ -322,7 +320,7 @@ public class Empresa {
 			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
 					+ "	Descripcion: " + descripcion + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
 					+ precio_venta);
-		}
+		} while(rs.next());
 	}
 
 	/**
@@ -335,8 +333,7 @@ public class Empresa {
 	 *                    encuentra en 0
 	 * @param descripcion Descripción donde especificamos el proveedor del producto
 	 * @param preCo       Es el precio que tendrá cada unidad de producto
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void anhadirProductoN(String nombre, int cantidad, String descripcion, double preCo)
 			throws SQLException {
@@ -369,16 +366,15 @@ public class Empresa {
 	 * @param codigo Codigo que nos permitirá comprobar si el producto existe ya en
 	 *               la base de datos.
 	 * @param cant   Es la cantidad del producto que desea añadir.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void anhadirProductoE(int codigo, int cant) throws SQLException {
+	public static void anhadirExistencias(int codigo, int cant) throws SQLException {
 		st = connection.createStatement();
-		rs = st.executeQuery("select codigo_prod from producto where codigo_prod=" + codigo);
+		rs = st.executeQuery("select * from producto where codigo_prod=" + codigo);
 
 		if (rs.next()) {
-			ps = connection
-					.prepareStatement("update PRODUCTO set cantidad=cantidad+" + cant + " where codigo_prod=" + codigo);
+			rs = st.executeQuery("update PRODUCTO set cantidad=cantidad+" + cant + " where codigo_prod=" + codigo);
+				System.out.println("Producto modificado");
 		} else {
 			System.out.println("Codigo de producto no existente");
 		}
@@ -393,8 +389,7 @@ public class Empresa {
 	 * 
 	 * @param persona Codigo de cliente o proveedor que nos servirá para identificar
 	 *                quien hace el pedido
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void altaPedido(String persona) throws SQLException { // Pedido
 		int pedido = 0;
@@ -426,8 +421,7 @@ public class Empresa {
 	 * Metodo que permite cancelar un pedido en especifico.
 	 * 
 	 * @param numeroped Numero de pedido para indicar cuál pedido se desea cancelar.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void cancelarPedido(int numeroped) throws SQLException {
 		st = connection.createStatement();
@@ -445,8 +439,7 @@ public class Empresa {
 	 * factura de un archivo txt.
 	 * 
 	 * @param numpedido Número de pedido para indicar que pedido se desea confirmar.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 * @throws IOException  Lanza esta excepción si hay algun error al crear el txt
 	 *                      del ticket.
 	 */
@@ -466,8 +459,7 @@ public class Empresa {
 	 * Metodo que permite cambiar el estado de un pedido a FINALIZADO
 	 * 
 	 * @param numpedido Número de pedido para indicar que pedido se desea finalizar.
-	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene
-	 *                      algún error.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void finalizarPedido(int numpedido) throws SQLException { // Calcula trigger trigger importe base
 		int finali;
@@ -493,8 +485,7 @@ public class Empresa {
 	 * Metodo que nos permite ver todos los articulos que tiene un pedido.
 	 * 
 	 * @param numeroped Número de pedido para indicar que pedido se desea visualizar
-	 * @throws SQLException Lanza esta excepción si hay algun error al crear el txt
-	 *                      del ticket.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void verArticulosPedido(int numeroped) throws SQLException { // revisar error "Nombre de columna no
 		// valido"
@@ -534,7 +525,7 @@ public class Empresa {
 							+ numeroped);
 			System.out.println("-------------------------");
 			System.out.println("PRODUCTOS DEL PEDIDO: " + numeroped);
-			while (rs.next()) {
+			do  {
 				codigo = rs.getInt("codigo_prod");
 				nombre = rs.getString("nombre");
 				cantidad = rs.getInt("cantidad_prod");
@@ -545,7 +536,7 @@ public class Empresa {
 				System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
 						+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "
 						+ String.format("%.2f", precioTotal));
-			}
+			} while (rs.next());
 			System.out.println("-------------------------");
 		}
 	}
@@ -561,11 +552,10 @@ public class Empresa {
 	 * @param cant       Indica la cantidad del producto que se añadira, si la
 	 *                   cantidad es superior a la que poseemos en nuestro almacén,
 	 *                   indicará que no hay cantidades suficientes.
-	 * @throws SQLException Lanza esta excepción si hay algun error al crear el txt
-	 *                      del ticket.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void anhadirProducto_Pedido(int numpedido, int codigoprod, int cant) throws SQLException { // Pedido
-		// Prod
+
 		int cantidad;
 		int codigo = 0;
 		int pedido = 0;
@@ -597,6 +587,7 @@ public class Empresa {
 						ps.execute();
 						ps.close();
 						System.out.println("Producto añadido al pedido correctamente");
+						Empresa.calcularImporte(numpedido);
 					}
 				} else {
 					System.out.println("Error al añadir producto, no hay existencias suficientes");
@@ -617,7 +608,7 @@ public class Empresa {
 	 *                   tiene el producto en el pedido, se le indicará con un
 	 *                   mensaje).
 	 * @param cant       Cantidad del producto que desea modificar.
-	 * @throws SQLException
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void modificarCantidadProd_Pedido(int numpedido, int codigoprod, int cant) throws SQLException { // Pedido
 		// Prod
@@ -636,8 +627,7 @@ public class Empresa {
 					ps.execute();
 					ps.close();
 					System.out.println("Pedido modificado correctamente");
-
-					// PROCEDICMINETO IMPORTE
+					Empresa.calcularImporte(numpedido);
 				} else {
 					System.out.println("Error al modificar producto, existencias insuficientes");
 				}
@@ -652,8 +642,7 @@ public class Empresa {
 	 * 
 	 * @param numpedido  Indica el pedido en el cual desea eliminar el producto
 	 * @param codigoprod Producto que se desea eliminar.
-	 * @throws SQLException Lanza esta excepción si hay algun error al crear el txt
-	 *                      del ticket.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
 	public static void eliminarProducto_Pedido(int numpedido, int codigoprod) throws SQLException {
 
@@ -665,7 +654,7 @@ public class Empresa {
 			ps.execute();
 			ps.close();
 			System.out.println("Pedido modificado correctamente");
-			// PROCEDICMINETO IMPORTE
+			Empresa.calcularImporte(numpedido);
 		} else {
 			System.out.println("Error al modificar producto, existencias incorrectas");
 		}
@@ -679,10 +668,8 @@ public class Empresa {
 	 * 
 	 * @param numpedido Indica el pedido especifico al cual se desea generar el
 	 *                  ticket.
-	 * @throws SQLException Lanza esta excepción si hay algun error al crear el txt
-	 *                      del ticket.
-	 * @throws IOException  Lanza esta excepción si hay algún error al generar el
-	 *                      ticket.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @throws IOException  Lanza esta excepción si hay algún error al generar el ticket.
 	 */
 	public static void generarFactura(int numpedido) throws SQLException, IOException {
 		String finali;
@@ -773,5 +760,18 @@ public class Empresa {
 		} else {
 			System.out.println("Codigo de producto no existente");
 		}
+	}
+	
+	/**
+	 * Metodo que calcula el importe de un pedido cada vez que se añada, modifica o borre un producto del mismo
+	 * es un procedicimiento que se ejecuta en nuestra BBDD, modifica el campo "importe_total
+	 * 
+	 * @param numpedido Numero de pedido que le indica al procedimiento de que pedido tiene que calcular el importe.
+	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 */
+	public static void calcularImporte (int numpedido) throws SQLException{
+		CallableStatement cs= connection.prepareCall("{call calcular_importe (?)}");
+		cs.setInt(1, numpedido);
+		cs.execute();
 	}
 }
