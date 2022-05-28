@@ -100,7 +100,8 @@ public class Empresa {
 	 * @param passwordB Contraseña del usuario de la base de datos.
 	 * @throws Exception Lanza esta excepción en caso de no lograr iniciar sesión.
 	 */
-	public static void conectar(String loginB, String passwordB) {
+	public static boolean conectar(String loginB, String passwordB) {
+		boolean correcto= false;
 		login = loginB;
 		password = passwordB;
 		try {
@@ -108,10 +109,12 @@ public class Empresa {
 			connection = DriverManager.getConnection(url, login, password);
 			if (connection != null) {
 				System.out.println("Conexión realizada correctamente");
+				return correcto=true;
 			}
 		} catch (Exception e) {
 			System.out.println("Datos incorrectos");
 		}
+		return correcto;
 	}
 
 	// METODOS CLIENTE
@@ -129,31 +132,41 @@ public class Empresa {
 	 * @param postal    Indica la postal del cliente.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void anadirCliente(String dni, String nombre, String apellidos, int number, String dir, int postal)
-			throws SQLException {
+	public static String anadirCliente(String dni, String nombre, String apellidos, int number, String dir, int postal)
+	{
+		String codigo="NoCode";
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select cast(max(ltrim(codigo,'CL')) as int)" + "\"NUMERO_CLIENTE\""
-				+ "from persona where codigo like 'CL%'");
-		if (rs.next()) {
-			numCL = rs.getInt("NUMERO_CLIENTE");
+
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select cast(max(ltrim(codigo,'CL')) as int)" + "\"NUMERO_CLIENTE\""
+					+ "from persona where codigo like 'CL%'");
+			if (rs.next()) {
+				numCL = rs.getInt("NUMERO_CLIENTE");
+			}
+			ps = connection.prepareStatement("insert into PERSONA values ((?),(?),(?),(?),(?),(?),(?))");
+
+			ps.setString(1, "CL" + (numCL + 1));
+			ps.setString(2, dni);
+			ps.setString(3, nombre);
+			ps.setString(4, apellidos);
+			ps.setInt(5, number);
+			ps.setString(6, dir);
+			ps.setInt(7, postal);
+
+			ps.execute();
+			ps.close();
+			st.close();
+
+			codigo="CL"+(numCL+1);
+
+			System.out.println("Cliente añadido correctamente");
+
+		} catch (SQLException e) {
+			return codigo;
 		}
-		ps = connection.prepareStatement("insert into PERSONA values ((?),(?),(?),(?),(?),(?),(?))");
 
-		ps.setString(1, "CL" + (numCL + 1));
-		ps.setString(2, dni);
-		ps.setString(3, nombre);
-		ps.setString(4, apellidos);
-		ps.setInt(5, number);
-		ps.setString(6, dir);
-		ps.setInt(7, postal);
-
-		ps.execute();
-		ps.close();
-		st.close();
-
-		System.out.println("Cliente añadido correctamente");
-
+		return codigo;
 	}
 
 	/**
@@ -229,31 +242,62 @@ public class Empresa {
 	 * @param postal Codigo postal de de la empresa o del autonomo.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void anadirProv(String dni, String nombre, int number, String dir, int postal) throws SQLException {
+	public static String anadirProv(String dni, String nombre, int number, String dir, int postal) {
+		String codigo="NoCode";
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select cast(max(ltrim(codigo,'PR')) as int)" + "\"NUMERO_PROV\""
-				+ "from persona where codigo like 'PR%'");
-		if (rs.next()) {
-			numPR = rs.getInt("NUMERO_PROV");
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select cast(max(ltrim(codigo,'PR')) as int)" + "\"NUMERO_PROV\""
+					+ "from persona where codigo like 'PR%'");
+			if (rs.next()) {
+				numPR = rs.getInt("NUMERO_PROV");
+			}
+
+			ps = connection.prepareStatement("insert into PERSONA values ((?),(?),(?),(?),(?),(?),(?))");
+
+			ps.setString(1, "PR" + (numPR + 1));
+			ps.setString(2, dni);
+			ps.setString(3, nombre);
+			ps.setString(4, "-");
+			ps.setInt(5, number);
+			ps.setString(6, dir);
+			ps.setInt(7, postal);
+
+			ps.execute();
+			ps.close();
+			st.close();
+
+			codigo="PR"+(numPR+1);
+			System.out.println("Proveedor añadido correctamente");
+
+
+		} catch (SQLException e) {
+			return codigo;
 		}
 
-		ps = connection.prepareStatement("insert into PERSONA values ((?),(?),(?),(?),(?),(?),(?))");
+		return codigo;
+	}
+	
+	public static void mostrarPersona(String codigo) throws SQLException {
 
-		ps.setString(1, "PR" + (numPR + 1));
-		ps.setString(2, dni);
-		ps.setString(3, nombre);
-		ps.setString(4, "-");
-		ps.setInt(5, number);
-		ps.setString(6, dir);
-		ps.setInt(7, postal);
+		st = connection.createStatement();
+		rs = st.executeQuery("select codigo, dni_nif, nombre, apellidos, numero_telefono, direccion, cod_postal from persona where upper (codigo)='" + codigo + "'");
 
-		ps.execute();
-		ps.close();
-		st.close();
+		if (rs.next()) {
+				String cod=rs.getString("codigo");
+				String dni_nif=rs.getString("dni_nif");
+				String nombre=rs.getString("nombre");
+				String apellidos=rs.getString("apellidos");
+				int num=rs.getInt("numero_telefono");
+				String dir=rs.getString("direccion");
+				int postal=rs.getInt("cod_postal");
+				
+				System.out.println("CÓDIGO:"+cod+"   DNI/NIF"+dni_nif+"   NOMBRE:"+nombre+"   APELLIDOS:"+apellidos+"   NUMERO DE TELEFONO: "+num+"   DIRECCIÓN: "+dir+"   CÓDIGO POSTAL:"+postal);
+		}
 
-		System.out.println("Proveedor añadido correctamente");
-
+		else {
+			System.out.println("Cliente no encontrado");
+		}
 	}
 
 	// METODOS ALMACEN
@@ -265,12 +309,12 @@ public class Empresa {
 	 */
 	public static void verProductos() throws SQLException {
 		int codigo_producto, cant;
-		String nombre, descripcion;
+		String nombre, marca;
 		Double precio_compra, precio_venta;
 
 		st = connection.createStatement();
 		rs = st.executeQuery(
-				"select codigo_prod, nombre, cantidad, descripcion, precio_compra, precio_venta from producto");
+				"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto");
 		if (!rs.next()) {
 			System.out.println("No hay productos en el almacén");
 		}
@@ -278,11 +322,11 @@ public class Empresa {
 			codigo_producto = rs.getInt("codigo_prod");
 			nombre = rs.getString("nombre");
 			cant = rs.getInt("cantidad");
-			descripcion = rs.getString("descripcion");
+			marca = rs.getString("descripcion");
 			precio_compra = rs.getDouble("precio_compra");
 			precio_venta = rs.getDouble("precio_venta");
 			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
-					+ "	Descripcion: " + descripcion + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
+					+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
 					+ precio_venta);
 		} while (rs.next());
 	
@@ -300,12 +344,12 @@ public class Empresa {
 	 */
 	public static void verProductoNombre(String nombreProd) throws SQLException {
 		int codigo_producto, cant;
-		String nombre, descripcion;
+		String nombre, marca;
 		Double precio_compra, precio_venta;
 
 		st = connection.createStatement();
 		rs = st.executeQuery(
-				"select codigo_prod, nombre, cantidad, descripcion, precio_compra, precio_venta from producto where nombre='"
+				"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto where nombre='"
 						+ nombreProd + "'");
 		if (!rs.next()) {
 			System.out.println("No hay productos en el almacén");
@@ -314,11 +358,11 @@ public class Empresa {
 			codigo_producto = rs.getInt("codigo_prod");
 			nombre = rs.getString("nombre");
 			cant = rs.getInt("cantidad");
-			descripcion = rs.getString("descripcion");
+			marca = rs.getString("descripcion");
 			precio_compra = rs.getDouble("precio_compra");
 			precio_venta = rs.getDouble("precio_venta");
 			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
-					+ "	Descripcion: " + descripcion + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
+					+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
 					+ precio_venta);
 		} while(rs.next());
 	}
