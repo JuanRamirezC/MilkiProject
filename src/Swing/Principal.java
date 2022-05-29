@@ -5,6 +5,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import Swing.Almacen.PanelAlmacen;
+import Swing.Cliente.PanelClientes;
+import Swing.Pedidos.PanelPedidos;
+import Swing.Proveedor.PanelProveedores;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Cursor;

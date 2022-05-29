@@ -14,6 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+
 /**
  * Esta clase contiene todos los metodos que vamos a usar para dar funcionalidad
  * a la base de datos.
@@ -69,7 +72,7 @@ public class Empresa {
 	 *  Variable que almacena la IP que puede ir cambiando dado que la maquina donde se encuentra la BBDD no tiene una IP estática.
 	 */
 	private static String ip = "192.168.0.32"; //
-	
+
 	/**
 	 * Dirección que nos indica donde se encuentra nuestra base de datos.
 	 */
@@ -100,6 +103,7 @@ public class Empresa {
 	 * @param loginB    Nombre de usuario de la base de datos.
 	 * @param passwordB Contraseña del usuario de la base de datos.
 	 * @throws Exception Lanza esta excepción en caso de no lograr iniciar sesión.
+	 * @return correcto Devuelve true si la conexión fue correcta o false en caso contrario
 	 */
 	public static boolean conectar(String loginB, String passwordB) {
 		boolean correcto= false;
@@ -132,6 +136,7 @@ public class Empresa {
 	 * @param dir       Indica la direccion del cliente.
 	 * @param postal    Indica la postal del cliente.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return codigo Devuelve el codigo generado automaticamente que identifica al Cliente creado.
 	 */
 	public static String anadirCliente(String dni, String nombre, String apellidos, int number, String dir, int postal)
 	{
@@ -160,7 +165,7 @@ public class Empresa {
 			st.close();
 
 			codigo="CL"+(numCL+1);
-			
+
 			System.out.println("Cliente añadido correctamente");
 
 		} catch (SQLException e) {
@@ -174,62 +179,99 @@ public class Empresa {
 	 * Metodo borra de nuestra base de datos un cliente o proveedor según los datos
 	 * introducidos por parametro.
 	 * 
-	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la
-	 *               base de datos y borrarlo.
+	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la base de datos y borrarlo.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return res Booleano que devuelve true en caso de haber borrado correctamente y false en caso contrario.
 	 */
-	public static boolean borrarPersona(String codigo) throws SQLException {
+	public static boolean borrarPersona(String codigo)  {
 		boolean res=false;
-		st = connection.createStatement();
-		rs = st.executeQuery("select * from persona where upper (codigo)='" + codigo + "'");
 
-		if (rs.next()) {
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select * from persona where upper (codigo)='" + codigo + "'");
 
-			ps = connection.prepareStatement("delete from persona where upper (codigo)='" + codigo + "'");
-			ps.execute();
-			ps.close();
-			st.close();
-			System.out.println("Cliente borrado correctamente");
-			res=true;
-			return res;
+			if (rs.next()) {
+
+				ps = connection.prepareStatement("delete from persona where upper (codigo)='" + codigo + "'");
+				ps.execute();
+
+				System.out.println("Borrado correctamente");
+				res=true;
+				return res;
+			}
+			else {
+				System.out.println("No encontrado");
+			}
+		} catch (SQLException e) {
+			res=false;
 		}
 
-		else {
-			System.out.println("Cliente no encontrado");
+		finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				res=false;
+			}
+			try {
+				st.close();
+			} catch (SQLException e) {
+				res=false;
+
+			}
 		}
 		return res;
+
 	}
+
 
 	/**
 	 * Metodo muestra todos los pedidos relacionados a un cliente o un proveedor
 	 * especifico.
 	 * 
-	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la
-	 *               base de datos y hacer una consulta especifica.
+	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la base de datos y hacer una consulta especifica.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void mostrarPedidos(String codigo) throws SQLException {
+	public static void mostrarPedidos(String codigo)  {
 		int num_pedido;
 		double importe_total;
 		Date fecha;
 		String estado;
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select num_pedido, importe_total, fecha_pedido, estado from pedido where cod_persona='"+codigo+"'");
-		if (rs.next()) {
-			do {
-				num_pedido = rs.getInt("num_pedido");
-				importe_total = rs.getDouble("importe_total");
-				fecha = rs.getDate("fecha_pedido");
-				estado = rs.getString("estado");
-				System.out.println("Pedido numero: " + num_pedido + "	Importe total: " + importe_total + "	Fecha: "
-				+ fecha + "	Estado: " + estado);
-			
-			}while (rs.next());	
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select num_pedido, importe_total, fecha_pedido, estado from pedido where cod_persona='"+codigo+"'");
+			if (rs.next()) {
+				do {
+					num_pedido = rs.getInt("num_pedido");
+					importe_total = rs.getDouble("importe_total");
+					fecha = rs.getDate("fecha_pedido");
+					estado = rs.getString("estado");
+					System.out.println("Pedido numero: " + num_pedido + "	Importe total: " + importe_total + "	Fecha: "
+							+ fecha + "	Estado: " + estado);
+
+				}while (rs.next());	
+			}
+			else {
+				System.out.println("No hay pedidos para el cliente o el proveedor de cliente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al acceder a los pedidos.");
 		}
-		else {
-			System.out.println("No hay pedidos para el cliente o el proveedor de cliente");
+
+		finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error en la consulta anidada");
+			}
+			try {
+				st.close();
+			} catch (SQLException e) {
+				System.out.println("Error al cerrar la conexión");
+
+			}
 		}
+
 	}
 
 	// METODOS PROVEEDOR
@@ -245,6 +287,8 @@ public class Empresa {
 	 * @param dir    Direccion de la empresa o del autonomo.
 	 * @param postal Codigo postal de de la empresa o del autonomo.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return codigo Devuelve el codigo generado automaticamente que identifica al Proveedor creado.
+	 * 
 	 */
 	public static String anadirProv(String dni, String nombre, int number, String dir, int postal) {
 		String codigo="NoCode";
@@ -281,13 +325,19 @@ public class Empresa {
 
 		return codigo;
 	}
-	
-	public static String mostrarPersona(String codigo) throws SQLException {
-		String res="Cliente no encontrado";
-		st = connection.createStatement();
-		rs = st.executeQuery("select codigo, dni_nif, nombre, apellidos, numero_telefono, direccion, cod_postal from persona where upper (codigo)='" + codigo + "'");
 
-		if (rs.next()) {
+	/**
+	 * Metodo que permite conseguir la información de un cliente o proveedor introducido por parámetro.
+	 * @param codigo Es el codigo del cliente o proveedor para poder buscarlo en la base de datos y hacer una consulta especifica.
+	 * @return res String que devuelve toda la información recibiba por la consulta.
+	 */
+	public static String mostrarPersona(String codigo) {
+		String res="Cliente no encontrado";
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select codigo, dni_nif, nombre, apellidos, numero_telefono, direccion, cod_postal from persona where upper (codigo)='" + codigo + "'");
+
+			if (rs.next()) {
 				String cod=rs.getString("codigo");
 				String dni_nif=rs.getString("dni_nif");
 				String nombre=rs.getString("nombre");
@@ -295,14 +345,18 @@ public class Empresa {
 				int num=rs.getInt("numero_telefono");
 				String dir=rs.getString("direccion");
 				int postal=rs.getInt("cod_postal");
-				
+
 				System.out.println("CÓDIGO:"+cod+"   DNI/NIF"+dni_nif+"   NOMBRE:"+nombre+"   APELLIDOS:"+apellidos+"   NUMERO DE TELEFONO: "+num+"   DIRECCIÓN: "+dir+"   CÓDIGO POSTAL:"+postal);
 				res="CÓDIGO:"+cod+"   DNI/NIF:"+dni_nif+"   NOMBRE:"+nombre+"   APELLIDOS:"+apellidos+"    NUMERO DE TELEFONO: "+num+"   DIRECCIÓN: "+dir+"   CÓDIGO POSTAL:"+postal;
+			}
+
+			else {
+				System.out.println("No encontrado");
+			}
+		} catch (SQLException e) {
+			return res;
 		}
 
-		else {
-			System.out.println("Cliente no encontrado");
-		}
 		return res;
 	}
 
@@ -313,29 +367,35 @@ public class Empresa {
 	 * 
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void verProductos() throws SQLException {
+	public static void verProductos()  {
 		int codigo_producto, cant;
 		String nombre, marca;
 		Double precio_compra, precio_venta;
 
-		st = connection.createStatement();
-		rs = st.executeQuery(
-				"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto");
-		if (!rs.next()) {
-			System.out.println("No hay productos en el almacén");
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery(
+					"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto");
+			if (!rs.next()) {
+				System.out.println("No hay productos en el almacén");
+			}
+			do {
+				codigo_producto = rs.getInt("codigo_prod");
+				nombre = rs.getString("nombre");
+				cant = rs.getInt("cantidad");
+				marca = rs.getString("descripcion");
+				precio_compra = rs.getDouble("precio_compra");
+				precio_venta = rs.getDouble("precio_venta");
+				System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
+						+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
+						+ precio_venta);
+			} while (rs.next());
+
+		} catch (SQLException e) {
+			System.out.println("Error en el acceso o consulta a la base de datos.");
 		}
-		do {
-			codigo_producto = rs.getInt("codigo_prod");
-			nombre = rs.getString("nombre");
-			cant = rs.getInt("cantidad");
-			marca = rs.getString("descripcion");
-			precio_compra = rs.getDouble("precio_compra");
-			precio_venta = rs.getDouble("precio_venta");
-			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
-					+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
-					+ precio_venta);
-		} while (rs.next());
-	
+		
 	}
 
 	/**
@@ -348,30 +408,35 @@ public class Empresa {
 	 *                   base de datos
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void verProductoNombre(String nombreProd) throws SQLException {
+	public static void verProductoNombre(String nombreProd) {
 		int codigo_producto, cant;
 		String nombre, marca;
 		Double precio_compra, precio_venta;
 
-		st = connection.createStatement();
-		rs = st.executeQuery(
-				"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto where nombre='"
-						+ nombreProd + "'");
-		if (!rs.next()) {
-			System.out.println("No hay productos en el almacén");
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery(
+					"select codigo_prod, nombre, cantidad, marca, precio_compra, precio_venta from producto where nombre='"
+							+ nombreProd + "'");
+			if (!rs.next()) {
+				System.out.println("No hay productos en el almacén");
+			}
+			do {
+				codigo_producto = rs.getInt("codigo_prod");
+				nombre = rs.getString("nombre");
+				cant = rs.getInt("cantidad");
+				marca = rs.getString("descripcion");
+				precio_compra = rs.getDouble("precio_compra");
+				precio_venta = rs.getDouble("precio_venta");
+				System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
+						+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
+						+ precio_venta);
+
+			} while(rs.next());
+		} catch (SQLException e) {
+			System.out.println("Error al buscar el producto deseado.");
 		}
-		do {
-			codigo_producto = rs.getInt("codigo_prod");
-			nombre = rs.getString("nombre");
-			cant = rs.getInt("cantidad");
-			marca = rs.getString("descripcion");
-			precio_compra = rs.getDouble("precio_compra");
-			precio_venta = rs.getDouble("precio_venta");
-			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
-					+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
-					+ precio_venta);
-			
-		} while(rs.next());
+		
 	}
 
 	/**
@@ -385,29 +450,66 @@ public class Empresa {
 	 * @param descripcion Descripción donde especificamos el proveedor del producto
 	 * @param preCo       Es el precio que tendrá cada unidad de producto
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return codigo Devuelve el identificador que se le ha asignado
 	 */
-	public static void anhadirProductoN(String nombre, int cantidad, String descripcion, double preCo)
-			throws SQLException {
+	public static int anhadirProductoN(String nombre, int cantidad, String descripcion, double preCo) {
+		int codigo = 0;
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select max(codigo_prod)" + "\"CODIGOPROD\"" + "from producto");
+			if (rs.next()) {
+				codProd = rs.getInt("CODIGOPROD");
+			}
+			ps = connection.prepareStatement("insert into PRODUCTO values ((?),(?),(?),(?),(?),(?))");
+			ps.setInt(1, codProd + 1);
+			ps.setString(2, nombre);
+			ps.setInt(3, cantidad);
+			ps.setString(4, descripcion);
+			ps.setDouble(5, preCo);
+			ps.setDouble(6, preCo * BENEFICIO);
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select max(codigo_prod)" + "\"CODIGOPROD\"" + "from producto");
-		if (rs.next()) {
-			codProd = rs.getInt("CODIGOPROD");
+			ps.execute();
+			
+			codigo=codProd+1;
+			
+			System.out.println("Producto añadido correctamente");
+			return codigo;
+		} catch (SQLException e) {
+			System.out.println("Error al insertar el producto nuevo.");
+		} finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error en la consulta anidada");
+			}
+			try {
+				st.close();
+			} catch (SQLException e) {
+				System.out.println("Error al cerrar la conexión");
+
+			}
 		}
-		ps = connection.prepareStatement("insert into PRODUCTO values ((?),(?),(?),(?),(?),(?))");
-		ps.setInt(1, codProd + 1);
-		ps.setString(2, nombre);
-		ps.setInt(3, cantidad);
-		ps.setString(4, descripcion);
-		ps.setDouble(5, preCo);
-		ps.setDouble(6, preCo * BENEFICIO);
+		return codigo;
+		
+	}
 
-		ps.execute();
-		ps.close();
+	public static void borrarProducto(int codigo) {
+		
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select * from producto where codigo_prod=" + codigo);
+			
+			if (rs.next()) {
+				rs = st.executeQuery("delete from PRODUCTO where codigo_prod=" + codigo);
+				System.out.println("Producto modificado");
+			} else {
+				System.out.println("Codigo de producto no existente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al intentar borrar el producto.");
+		}
 
-		st.close();
-
-		System.out.println("Producto añadido correctamente");
+	
 	}
 
 	/**
@@ -419,18 +521,39 @@ public class Empresa {
 	 * @param cant   Es la cantidad del producto que desea añadir.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void anhadirExistencias(int codigo, int cant) throws SQLException {
-		st = connection.createStatement();
-		rs = st.executeQuery("select * from producto where codigo_prod=" + codigo);
+	public static void anhadirExistencias(int codigo, int cant)  {
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select * from producto where codigo_prod=" + codigo);
 
-		if (rs.next()) {
-			rs = st.executeQuery("update PRODUCTO set cantidad=cantidad+" + cant + " where codigo_prod=" + codigo);
+			if (rs.next()) {
+				rs = st.executeQuery("update PRODUCTO set cantidad=cantidad+" + cant + " where codigo_prod=" + codigo);
 				System.out.println("Producto modificado");
-		} else {
-			System.out.println("Codigo de producto no existente");
+			} else {
+				System.out.println("Codigo de producto no existente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error en el acceso o consulta a la base de datos.");
 		}
+		
 	}
 
+	public static void modificarExistencias(int codigo, int cant) {
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select * from producto where codigo_prod=" + codigo);
+
+			if (rs.next()) {
+				rs = st.executeQuery("update PRODUCTO set cantidad=" + cant + " where codigo_prod=" + codigo);
+				System.out.println("Producto modificado");
+			} else {
+				System.out.println("Codigo de producto no existente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al modificar las existencias.");
+		}
+		
+	}
 	// METODOS GENERALES PEDIDOS
 
 	/**
@@ -438,34 +561,50 @@ public class Empresa {
 	 * añadiendo productos. Se generará un número identificativo único de pedido de
 	 * forma automatica.
 	 * 
-	 * @param persona Codigo de cliente o proveedor que nos servirá para identificar
-	 *                quien hace el pedido
+	 * @param persona Codigo de cliente o proveedor que nos servirá para identificar quien hace el pedido
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return pedido Devuelve un int con el número que identifica al pedido
 	 */
-	public static void altaPedido(String persona) throws SQLException { // Pedido
+	public static int altaPedido(String persona) { // Pedido
 		int pedido = 0;
-		st = connection.createStatement();
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select max(num_pedido)" + "\"PEDIDO\"" + "from pedido");
+			if (rs.next()) {
+				numPedido = rs.getInt("PEDIDO");
+			}
+			ps = connection.prepareStatement("insert into PEDIDO (NUM_PEDIDO, ESTADO, COD_PERSONA)  values ((?),(?),(?)) ");
+			ps.setInt(1, numPedido + 1);
+			ps.setString(2, "INICIADO");
+			ps.setString(3, persona);
+			
+			System.out.println("Pedido añadido correctamente");
 
-		rs = st.executeQuery("select max(num_pedido)" + "\"PEDIDO\"" + "from pedido");
-		if (rs.next()) {
-			numPedido = rs.getInt("PEDIDO");
+			rs = st.executeQuery("select max(num_pedido)" + "\"PEDIDO\"" + "from pedido");
+			if (rs.next())
+				pedido = rs.getInt("PEDIDO");
+
+			System.out.println("Numero de pedido: " + pedido);
+			ps.execute();
+		} catch (SQLException e) {
+			System.out.println("Error al dar de alta el nuevo pedido.");
 		}
-		ps = connection.prepareStatement("insert into PEDIDO (NUM_PEDIDO, ESTADO, COD_PERSONA)  values ((?),(?),(?)) ");
-		ps.setInt(1, numPedido + 1);
-		ps.setString(2, "INICIADO");
-		ps.setString(3, persona);
+		finally {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error en la consulta anidada");
+			}
+			try {
+				st.close();
+			} catch (SQLException e) {
+				System.out.println("Error al cerrar la conexión");
 
-		ps.execute();
-		ps.close();
+			}
+		}
+		
 
-		System.out.println("Pedido añadido correctamente");
-
-		rs = st.executeQuery("select max(num_pedido)" + "\"PEDIDO\"" + "from pedido");
-		if (rs.next())
-			pedido = rs.getInt("PEDIDO");
-
-		System.out.println("Numero de pedido: " + pedido);
-		st.close();
+		return pedido ;
 	}
 
 	/**
@@ -474,15 +613,21 @@ public class Empresa {
 	 * @param numeroped Numero de pedido para indicar cuál pedido se desea cancelar.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void cancelarPedido(int numeroped) throws SQLException {
-		st = connection.createStatement();
-		rs = st.executeQuery("select * from pedido where num_pedido=" + numeroped);
-		if (rs.next()) {
-			rs = st.executeQuery("update PEDIDO set ESTADO='CANCELADO', FINALIZADO=1 where num_pedido=" + numeroped);
-			rs = st.executeQuery("delete from pedido_prod where num_pedido=" + numeroped);
+	public static void cancelarPedido(int numeroped) {
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select * from pedido where num_pedido=" + numeroped);
+			if (rs.next()) {
+				rs = st.executeQuery("update PEDIDO set ESTADO='CANCELADO', FINALIZADO=1 where num_pedido=" + numeroped);
+				rs = st.executeQuery("delete from pedido_prod where num_pedido=" + numeroped);
 
-			System.out.println("Pedido cancelado correctamente");
+				System.out.println("Pedido cancelado correctamente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al cancelar pedido.");
 		}
+		
 	}
 
 	/**
@@ -494,16 +639,22 @@ public class Empresa {
 	 * @throws IOException  Lanza esta excepción si hay algun error al crear el txt
 	 *                      del ticket.
 	 */
-	public static void confirmarPedido(int numpedido) throws SQLException, IOException {
-		st = connection.createStatement();
-
-		rs = st.executeQuery("select * from pedido where num_pedido=" + numpedido);
-		if (rs.next()) {
-			rs = st.executeQuery("update pedido set estado='CONFIRMADO' where num_pedido=" + numpedido);
-			Empresa.generarFactura(numpedido);
-		} else {
-			System.out.println("Pedido no existente");
+	public static void confirmarPedido(int numpedido)  {
+		try {
+			st = connection.createStatement();
+			rs = st.executeQuery("select * from pedido where num_pedido=" + numpedido);
+			
+			if (rs.next()) {
+				rs = st.executeQuery("update pedido set estado='CONFIRMADO' where num_pedido=" + numpedido);
+				Empresa.generarFactura(numpedido);
+			} else {
+				System.out.println("Pedido no existente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al confirmar pedido.");
+			e.printStackTrace();
 		}
+		
 	}
 
 	/**
@@ -512,24 +663,27 @@ public class Empresa {
 	 * @param numpedido Número de pedido para indicar que pedido se desea finalizar.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void finalizarPedido(int numpedido) throws SQLException { // Calcula trigger trigger importe base
+	public static void finalizarPedido(int numpedido) { // Calcula trigger trigger importe base
 		int finali;
-		st = connection.createStatement();
-
-		rs = st.executeQuery("select finalizado from pedido where num_pedido=" + numpedido);
-		if (rs.next()) {
-			finali = rs.getInt("finalizado");
-			if (finali == 0) {
-				rs = st.executeQuery(
-						"update pedido set finalizado=1, estado='FINALIZADO' where num_pedido=" + numpedido);
-				System.out.println("Pedido finalizado");
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select finalizado from pedido where num_pedido=" + numpedido);
+			if (rs.next()) {
+				finali = rs.getInt("finalizado");
+				if (finali == 0) {
+					rs = st.executeQuery(
+							"update pedido set finalizado=1, estado='FINALIZADO' where num_pedido=" + numpedido);
+					System.out.println("Pedido finalizado");
+				} else {
+					System.out.println("Pedido ya se encuentra finalizado");
+				}
 			} else {
-				System.out.println("Pedido ya se encuentra finalizado");
+				System.out.println("Pedido no existente");
 			}
-		} else {
-			System.out.println("Pedido no existente");
+		} catch (SQLException e) {
+			System.out.println("Error al finalizar pedido.");
 		}
-
 	}
 
 	/**
@@ -538,58 +692,65 @@ public class Empresa {
 	 * @param numeroped Número de pedido para indicar que pedido se desea visualizar
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void verArticulosPedido(int numeroped) throws SQLException { // revisar error "Nombre de columna no
+	public static void verArticulosPedido(int numeroped)  { // revisar error "Nombre de columna no
 		// valido"
 		String nombre, aux = "";
 		int codigo, cantidad;
 		double precio, precioTotal;
 
-		st = connection.createStatement();
-		rs = st.executeQuery(
-				"select substr(cod_persona,1,2)" + "\"CODIGO\"" + "from pedido where num_pedido=" + numeroped);
-		if (rs.next()) {
-			aux = rs.getString("CODIGO");
-
-		}
-		if (aux.equals("CL")) {
+		try {
+			st = connection.createStatement();
+			
 			rs = st.executeQuery(
-					"select prd.codigo_prod,nombre, cantidad_prod,precio_venta from pedido_prod prd join producto pd on prd.codigo_prod=pd.codigo_prod where num_pedido="
-							+ numeroped);
-			System.out.println("-------------------------");
-			System.out.println("PRODUCTOS DEL PEDIDO: " + numeroped);
-			while (rs.next()) {
-				codigo = rs.getInt("codigo_prod");
-				nombre = rs.getString("nombre");
-				cantidad = rs.getInt("cantidad_prod");
-				precio = rs.getDouble("precio_venta");
+					"select substr(cod_persona,1,2)" + "\"CODIGO\"" + "from pedido where num_pedido=" + numeroped);
+			if (rs.next()) {
+				aux = rs.getString("CODIGO");
 
-				precioTotal = cantidad * precio;				
-
-				System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
-						+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "
-						+ String.format("%.2f", precioTotal));
 			}
-			System.out.println("-------------------------");
-		} else {
-			rs = st.executeQuery(
-					"select prd.codigo_prod,nombre, cantidad_prod,precio_compra from pedido_prod prd join producto pd on prd.codigo_prod=pd.codigo_prod where num_pedido="
-							+ numeroped);
-			System.out.println("-------------------------");
-			System.out.println("PRODUCTOS DEL PEDIDO: " + numeroped);
-			do  {
-				codigo = rs.getInt("codigo_prod");
-				nombre = rs.getString("nombre");
-				cantidad = rs.getInt("cantidad_prod");
-				precio = rs.getDouble("precio_compra");
+			if (aux.equals("CL")) {
+				rs = st.executeQuery(
+						"select prd.codigo_prod,nombre, cantidad_prod,precio_venta from pedido_prod prd join producto pd on prd.codigo_prod=pd.codigo_prod where num_pedido="
+								+ numeroped);
+				System.out.println("-------------------------");
+				System.out.println("PRODUCTOS DEL PEDIDO: " + numeroped);
+				while (rs.next()) {
+					codigo = rs.getInt("codigo_prod");
+					nombre = rs.getString("nombre");
+					cantidad = rs.getInt("cantidad_prod");
+					precio = rs.getDouble("precio_venta");
 
-				precioTotal = cantidad * precio;
+					precioTotal = cantidad * precio;				
 
-				System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
-						+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "
-						+ String.format("%.2f", precioTotal));
-			} while (rs.next());
-			System.out.println("-------------------------");
+					System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
+							+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "
+							+ String.format("%.2f", precioTotal));
+				}
+				System.out.println("-------------------------");
+			} else {
+				rs = st.executeQuery(
+						"select prd.codigo_prod,nombre, cantidad_prod,precio_compra from pedido_prod prd join producto pd on prd.codigo_prod=pd.codigo_prod where num_pedido="
+								+ numeroped);
+				System.out.println("-------------------------");
+				System.out.println("PRODUCTOS DEL PEDIDO: " + numeroped);
+				do  {
+					codigo = rs.getInt("codigo_prod");
+					nombre = rs.getString("nombre");
+					cantidad = rs.getInt("cantidad_prod");
+					precio = rs.getDouble("precio_compra");
+
+					precioTotal = cantidad * precio;
+
+					System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
+							+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "
+							+ String.format("%.2f", precioTotal));
+				} while (rs.next());
+				System.out.println("-------------------------");
+				}
+		} catch (SQLException e) {
+			System.out.println("Error al ver articulos de un pedido.");
 		}
+		
+	
 	}
 
 	// METODOS DENTRO DE PEDIDOS
@@ -600,54 +761,69 @@ public class Empresa {
 	 * 
 	 * @param numpedido  Indica a que pedido se le añadirá el producto.
 	 * @param codigoprod Indica el producto que desea añadir.
-	 * @param cant       Indica la cantidad del producto que se añadira, si la
-	 *                   cantidad es superior a la que poseemos en nuestro almacén,
-	 *                   indicará que no hay cantidades suficientes.
+	 * @param cant       Indica la cantidad del producto que se añadira, si la cantidad es superior a la que poseemos en nuestro almacén, indicará que no hay cantidades suficientes.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
+	 * @return correcto Devuelve boolean true en caso de poner añadir el producto al pedido y false en el caso contrario.
 	 */
-	public static void anhadirProducto_Pedido(int numpedido, int codigoprod, int cant) throws SQLException { // Pedido
-
+	public static boolean anhadirProducto_Pedido(int numpedido, int codigoprod, int cant)  { // Pedido
+		Boolean correcto=false;
 		int cantidad;
 		int codigo = 0;
 		int pedido = 0;
-		st = connection.createStatement();
-		rs = st.executeQuery("select num_pedido from pedido where num_pedido=" + numpedido);
-		if (rs.next()) {
-
-			rs = st.executeQuery("select num_pedido, codigo_prod from pedido_prod where num_pedido=" + numpedido
-					+ "and codigo_prod=" + codigoprod);
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select num_pedido from pedido where num_pedido=" + numpedido);
 			if (rs.next()) {
-				pedido = rs.getInt("num_pedido");
-				codigo = rs.getInt("codigo_prod");
-			}
 
-			rs = st.executeQuery("select cantidad from producto where codigo_prod=" + codigoprod);
-			if (rs.next()) {
-				cantidad = rs.getInt("cantidad");
-				if (cantidad >= cant) {
-					if (codigo == codigoprod && pedido == numpedido) {
-						rs = st.executeQuery("update pedido_prod set cantidad_prod=cantidad_prod +" + cant
-								+ "where num_pedido=" + numpedido + "and codigo_prod=" + codigoprod);
-						System.out.println("Producto ya existente, cantidad modificada");
+				rs = st.executeQuery("select num_pedido, codigo_prod from pedido_prod where num_pedido=" + numpedido
+						+ "and codigo_prod=" + codigoprod);
+				if (rs.next()) {
+					pedido = rs.getInt("num_pedido");
+					codigo = rs.getInt("codigo_prod");
+				}
+
+				rs = st.executeQuery("select cantidad from producto where codigo_prod=" + codigoprod);
+				if (rs.next()) {
+					cantidad = rs.getInt("cantidad");
+					if (cantidad >= cant) {
+						if (codigo == codigoprod && pedido == numpedido) {
+							rs = st.executeQuery("update pedido_prod set cantidad_prod=cantidad_prod +" + cant
+									+ "where num_pedido=" + numpedido + "and codigo_prod=" + codigoprod);
+							System.out.println("Producto ya existente, cantidad modificada");
+						} else {
+							ps = connection.prepareStatement("insert into pedido_prod values ((?),(?),(?)) ");
+							ps.setInt(1, numpedido);
+							ps.setInt(2, codigoprod);
+							ps.setInt(3, cant);
+
+							ps.execute();
+							ps.close();
+							System.out.println("Producto añadido al pedido correctamente");
+							Empresa.calcularImporte(numpedido);
+							correcto=true;
+						}
 					} else {
-						ps = connection.prepareStatement("insert into pedido_prod values ((?),(?),(?)) ");
-						ps.setInt(1, numpedido);
-						ps.setInt(2, codigoprod);
-						ps.setInt(3, cant);
-
-						ps.execute();
-						ps.close();
-						System.out.println("Producto añadido al pedido correctamente");
-						Empresa.calcularImporte(numpedido);
+						System.out.println("Error al añadir producto, no hay existencias suficientes");
+						correcto=false;
 					}
 				} else {
-					System.out.println("Error al añadir producto, no hay existencias suficientes");
+					System.out.println("Codigo de producto no existente");
+					correcto=false;
 				}
-			} else {
-				System.out.println("Codigo de producto no existente");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al añadir productos a pedido.");
+		} finally {
+			try {
+				st.close();
+			} catch (SQLException e) {
+				System.out.println("Error al cerrar la conexión");
 			}
 		}
-		st.close();
+		
+		
+		return correcto;
 	}
 
 	/**
@@ -661,31 +837,36 @@ public class Empresa {
 	 * @param cant       Cantidad del producto que desea modificar.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void modificarCantidadProd_Pedido(int numpedido, int codigoprod, int cant) throws SQLException { // Pedido
-		// Prod
+	public static void modificarCantidadProd_Pedido(int numpedido, int codigoprod, int cant) { // Pedido
 		int cantidad;
-		st = connection.createStatement();
-		rs = st.executeQuery("select num_pedido,codigo_prod from pedido_prod where num_pedido=" + numpedido);
-		if (rs.next()) {
-			rs = st.executeQuery("select cantidad from producto where codigo_prod=" + codigoprod);
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select num_pedido,codigo_prod from pedido_prod where num_pedido=" + numpedido);
 			if (rs.next()) {
-				cantidad = rs.getInt("cantidad");
-				if (cantidad >= cant) {
-					ps = connection.prepareStatement(
-							"update pedido_prod set cantidad_prod=(?) where codigo_prod=" + codigoprod);
-					ps.setInt(1, cant);
+				rs = st.executeQuery("select cantidad from producto where codigo_prod=" + codigoprod);
+				if (rs.next()) {
+					cantidad = rs.getInt("cantidad");
+					if (cantidad >= cant) {
+						ps = connection.prepareStatement(
+								"update pedido_prod set cantidad_prod=(?) where codigo_prod=" + codigoprod);
+						ps.setInt(1, cant);
 
-					ps.execute();
-					ps.close();
-					System.out.println("Pedido modificado correctamente");
-					Empresa.calcularImporte(numpedido);
+						ps.execute();
+						ps.close();
+						System.out.println("Pedido modificado correctamente");
+						Empresa.calcularImporte(numpedido);
+					} else {
+						System.out.println("Error al modificar producto, existencias insuficientes");
+					}
 				} else {
-					System.out.println("Error al modificar producto, existencias insuficientes");
+					System.out.println("Codigo de producto no existente");
 				}
-			} else {
-				System.out.println("Codigo de producto no existente");
 			}
+		} catch (SQLException e) {
+			System.out.println("Error al modificar productos de pedido.");
 		}
+		
 	}
 
 	/**
@@ -695,20 +876,26 @@ public class Empresa {
 	 * @param codigoprod Producto que se desea eliminar.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void eliminarProducto_Pedido(int numpedido, int codigoprod) throws SQLException {
+	public static void eliminarProducto_Pedido(int numpedido, int codigoprod)  {
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select num_pedido,codigo_prod from pedido_prod where codigo_prod=" + codigoprod
-				+ "and num_pedido=" + numpedido);
-		if (rs.next()) {
-			ps = connection.prepareStatement("delete from pedido_prod where codigo_prod=" + codigoprod);
-			ps.execute();
-			ps.close();
-			System.out.println("Pedido modificado correctamente");
-			Empresa.calcularImporte(numpedido);
-		} else {
-			System.out.println("Error al modificar producto, existencias incorrectas");
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select num_pedido,codigo_prod from pedido_prod where codigo_prod=" + codigoprod
+					+ "and num_pedido=" + numpedido);
+			if (rs.next()) {
+				ps = connection.prepareStatement("delete from pedido_prod where codigo_prod=" + codigoprod);
+				ps.execute();
+				ps.close();
+				System.out.println("Pedido modificado correctamente");
+				Empresa.calcularImporte(numpedido);
+			} else {
+				System.out.println("Error al modificar producto, existencias incorrectas");
+			}
+		} catch (SQLException e) {
+			System.out.println("Error al eliminar producto de pedido");
 		}
+		
 	}
 
 	/**
@@ -722,7 +909,7 @@ public class Empresa {
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 * @throws IOException  Lanza esta excepción si hay algún error al generar el ticket.
 	 */
-	public static void generarFactura(int numpedido) throws SQLException, IOException {
+	public static void generarFactura(int numpedido) {
 		String finali;
 
 		int numPedido, pedidoProd, cantidad, precioProd, total;
@@ -730,89 +917,97 @@ public class Empresa {
 		Date fecha;
 		double importe;
 
-		st = connection.createStatement();
-		rs = st.executeQuery("select estado from pedido where num_pedido=" + numpedido);
-		if (rs.next()) {
-			finali = rs.getString("estado");
+		try {
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("select estado from pedido where num_pedido=" + numpedido);
+			if (rs.next()) {
+				finali = rs.getString("estado");
 
-			if (finali.equals("CONFIRMADO")) {
-				f = new File(".", "Ticket-" + numpedido + ".txt");
-				fw = new FileWriter(f);
-				bw = new BufferedWriter(fw);
-				rs = st.executeQuery("select num_pedido, cod_persona, substr(cod_persona,1,2)" + "\"INICIALES\""
-						+ ", nombre, apellidos, fecha_pedido, importe_total from pedido pd join persona ps on pd.cod_persona=ps.codigo where num_pedido="
-						+ numpedido);
-				if (rs.next()) {
-					iniciales = rs.getString("INICIALES");
+				if (finali.equals("CONFIRMADO")) {
+					f = new File("./Tickets", "Ticket-" + numpedido + ".txt");
+					fw = new FileWriter(f);
+					bw = new BufferedWriter(fw);
+					rs = st.executeQuery("select num_pedido, cod_persona, substr(cod_persona,1,2)" + "\"INICIALES\""
+							+ ", nombre, apellidos, fecha_pedido, importe_total from pedido pd join persona ps on pd.cod_persona=ps.codigo where num_pedido="
+							+ numpedido);
+					if (rs.next()) {
+						iniciales = rs.getString("INICIALES");
 
-					if (iniciales.equals("CL")) {
-						numPedido = rs.getInt("num_pedido");
-						importe = rs.getDouble("importe_total");
-						cod_persona = rs.getString("cod_persona");
-						nombre = rs.getString("nombre");
-						apellidos = rs.getString("apellidos");
-						fecha = rs.getDate("fecha_pedido");
-
-						bw.write("***TICKET-" + numPedido + "***");
-						bw.newLine();
-						bw.write("-------------------------------------------------------");
-						bw.newLine();
-						bw.write("DATOS DEL PEDIDO:");
-						bw.newLine();
-						bw.write("PEDIDO Nº=" + numPedido);
-						bw.write("           FECHA DEL PEDIDO=" + fecha);
-						bw.newLine();
-						bw.write("-------------------------------------------------------");
-						bw.newLine();
-						bw.write("DATOS PERSONALES:");
-						bw.newLine();
-						bw.write("IDENTIFICADOR=" + cod_persona);
-						bw.write("      NOMBRE=" + nombre);
-						bw.newLine();
-						bw.write("                       APELLIDOS=" + apellidos);
-						bw.newLine();
-						bw.write("-------------------------------------------------------");
-						bw.newLine();
-						bw.write("PRODUCTOS:");
-						bw.newLine();
-						bw.write("-------------------------------------------------------");
-						bw.newLine();
-						rs = st.executeQuery(
-								"select pp.codigo_prod, nombre, cantidad,precio_venta, (precio_venta*cantidad)"
-										+ "\"TOTAL\""
-										+ " from pedido_prod pp join producto pr on pp.codigo_prod=pr.codigo_prod where pp.num_pedido="
-										+ numpedido);
-						while (rs.next()) {
-							pedidoProd = rs.getInt("codigo_prod");
+						if (iniciales.equals("CL")) {
+							numPedido = rs.getInt("num_pedido");
+							importe = rs.getDouble("importe_total");
+							cod_persona = rs.getString("cod_persona");
 							nombre = rs.getString("nombre");
-							cantidad = rs.getInt("cantidad");
-							precioProd = rs.getInt("precio_venta");
-							total = rs.getInt("TOTAL");
+							apellidos = rs.getString("apellidos");
+							fecha = rs.getDate("fecha_pedido");
 
-							bw.write("    IDENTIFICADOR DEL PRODUCTO=" + pedidoProd);
-							bw.newLine();
-							bw.write("    NOMBRE=" + nombre);
-							bw.newLine();
-							bw.write("    CANTIDAD=" + cantidad);
-							bw.write("    PRECIO UNITARIO=" + precioProd);
-							bw.write("    PRECIO TOTAL=" + total);
+							bw.write("***TICKET-" + numPedido + "***");
 							bw.newLine();
 							bw.write("-------------------------------------------------------");
 							bw.newLine();
+							bw.write("DATOS DEL PEDIDO:");
+							bw.newLine();
+							bw.write("PEDIDO Nº=" + numPedido);
+							bw.write("           FECHA DEL PEDIDO=" + fecha);
+							bw.newLine();
+							bw.write("-------------------------------------------------------");
+							bw.newLine();
+							bw.write("DATOS PERSONALES:");
+							bw.newLine();
+							bw.write("IDENTIFICADOR=" + cod_persona);
+							bw.write("      NOMBRE=" + nombre);
+							bw.newLine();
+							bw.write("                       APELLIDOS=" + apellidos);
+							bw.newLine();
+							bw.write("-------------------------------------------------------");
+							bw.newLine();
+							bw.write("PRODUCTOS:");
+							bw.newLine();
+							bw.write("-------------------------------------------------------");
+							bw.newLine();
+							rs = st.executeQuery(
+									"select pp.codigo_prod, nombre, cantidad,precio_venta, (precio_venta*cantidad)"
+											+ "\"TOTAL\""
+											+ " from pedido_prod pp join producto pr on pp.codigo_prod=pr.codigo_prod where pp.num_pedido="
+											+ numpedido);
+							while (rs.next()) {
+								pedidoProd = rs.getInt("codigo_prod");
+								nombre = rs.getString("nombre");
+								cantidad = rs.getInt("cantidad");
+								precioProd = rs.getInt("precio_venta");
+								total = rs.getInt("TOTAL");
+
+								bw.write("    IDENTIFICADOR DEL PRODUCTO=" + pedidoProd);
+								bw.newLine();
+								bw.write("    NOMBRE=" + nombre);
+								bw.newLine();
+								bw.write("    CANTIDAD=" + cantidad);
+								bw.write("    PRECIO UNITARIO=" + precioProd);
+								bw.write("    PRECIO TOTAL=" + total);
+								bw.newLine();
+								bw.write("-------------------------------------------------------");
+								bw.newLine();
+							}
+							bw.write("IMPORTE DEL PEDIDO=" + importe);
+							bw.close();
+							System.out.println("FACTURA GENERADA");
 						}
-						bw.write("IMPORTE DEL PEDIDO=" + importe);
-						bw.close();
-						System.out.println("FACTURA GENERADA");
 					}
+				} else {
+					System.out.println("No se puede generar FACTURA, compruebe ESTADO (FINALIZADO O CONFIRMADO)");
 				}
 			} else {
-				System.out.println("No se puede generar FACTURA, compruebe ESTADO (FINALIZADO O CONFIRMADO)");
+				System.out.println("Codigo de producto no existente");
 			}
-		} else {
-			System.out.println("Codigo de producto no existente");
+		} catch (SQLException e) {
+			System.out.println("Error al acceder a los datos.");
+		} catch (IOException e) {
+			System.out.println("No se ha podido crear el ticket");
 		}
+		
 	}
-	
+
 	/**
 	 * Metodo que calcula el importe de un pedido cada vez que se añada, modifica o borre un producto del mismo
 	 * es un procedicimiento que se ejecuta en nuestra BBDD, modifica el campo "importe_total
@@ -820,9 +1015,17 @@ public class Empresa {
 	 * @param numpedido Numero de pedido que le indica al procedimiento de que pedido tiene que calcular el importe.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void calcularImporte (int numpedido) throws SQLException{
-		CallableStatement cs= connection.prepareCall("{call calcular_importe (?)}");
-		cs.setInt(1, numpedido);
-		cs.execute();
+	public static void calcularImporte (int numpedido) 
+	{
+		CallableStatement cs;
+		try {
+			cs = connection.prepareCall("{call calcular_importe (?)}");
+			cs.setInt(1, numpedido);
+			cs.execute();
+		} catch (SQLException e) {
+			System.out.println("Error al calcular el importe.");
+		}
+		
 	}
+
 }
