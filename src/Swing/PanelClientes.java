@@ -116,6 +116,18 @@ public class PanelClientes extends JPanel {
 			public void mouseExited(MouseEvent e) {
 				btnConsultar.setBackground(new Color(255, 228, 225));
 			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				PanelMostrarCliente p1 =new PanelMostrarCliente();
+				p1.setSize(814,711);
+				p1.setLocation(0,0);
+				
+				panel.removeAll();
+				panel.setLayout(null);
+				panel.add(p1);
+				panel.revalidate();
+				panel.repaint();
+			}
 		});
 		btnConsultar.setFont(new Font("Verdana", Font.BOLD, 15));
 		btnConsultar.setFocusPainted(false);

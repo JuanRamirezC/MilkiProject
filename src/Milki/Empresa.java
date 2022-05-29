@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.IllegalBlockingModeException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -77,7 +78,7 @@ public class Empresa {
 	/**
 	 * Variable que indica si estamos conectados a la base de datos.
 	 */
-	static Connection connection = null;
+	public static Connection connection = null;
 
 	/**
 	 * Variable que guarda resultados de una consulta.
@@ -159,7 +160,7 @@ public class Empresa {
 			st.close();
 
 			codigo="CL"+(numCL+1);
-
+			
 			System.out.println("Cliente añadido correctamente");
 
 		} catch (SQLException e) {
@@ -177,8 +178,8 @@ public class Empresa {
 	 *               base de datos y borrarlo.
 	 * @throws SQLException Lanza esta excepción cuando nuestra base de datos tiene algún error.
 	 */
-	public static void borrarPersona(String codigo) throws SQLException {
-
+	public static boolean borrarPersona(String codigo) throws SQLException {
+		boolean res=false;
 		st = connection.createStatement();
 		rs = st.executeQuery("select * from persona where upper (codigo)='" + codigo + "'");
 
@@ -189,11 +190,14 @@ public class Empresa {
 			ps.close();
 			st.close();
 			System.out.println("Cliente borrado correctamente");
+			res=true;
+			return res;
 		}
 
 		else {
 			System.out.println("Cliente no encontrado");
 		}
+		return res;
 	}
 
 	/**
@@ -278,8 +282,8 @@ public class Empresa {
 		return codigo;
 	}
 	
-	public static void mostrarPersona(String codigo) throws SQLException {
-
+	public static String mostrarPersona(String codigo) throws SQLException {
+		String res="Cliente no encontrado";
 		st = connection.createStatement();
 		rs = st.executeQuery("select codigo, dni_nif, nombre, apellidos, numero_telefono, direccion, cod_postal from persona where upper (codigo)='" + codigo + "'");
 
@@ -293,11 +297,13 @@ public class Empresa {
 				int postal=rs.getInt("cod_postal");
 				
 				System.out.println("CÓDIGO:"+cod+"   DNI/NIF"+dni_nif+"   NOMBRE:"+nombre+"   APELLIDOS:"+apellidos+"   NUMERO DE TELEFONO: "+num+"   DIRECCIÓN: "+dir+"   CÓDIGO POSTAL:"+postal);
+				res="CÓDIGO:"+cod+"   DNI/NIF:"+dni_nif+"   NOMBRE:"+nombre+"   APELLIDOS:"+apellidos+"    NUMERO DE TELEFONO: "+num+"   DIRECCIÓN: "+dir+"   CÓDIGO POSTAL:"+postal;
 		}
 
 		else {
 			System.out.println("Cliente no encontrado");
 		}
+		return res;
 	}
 
 	// METODOS ALMACEN
@@ -364,6 +370,7 @@ public class Empresa {
 			System.out.println("Codigo de producto: " + codigo_producto + "	Nombre: " + nombre + "	Cantidad: " + cant
 					+ "	Descripcion: " + marca + "\nPrecio de Compra: " + precio_compra + "	Precio de venta: "
 					+ precio_venta);
+			
 		} while(rs.next());
 	}
 
@@ -556,7 +563,7 @@ public class Empresa {
 				cantidad = rs.getInt("cantidad_prod");
 				precio = rs.getDouble("precio_venta");
 
-				precioTotal = cantidad * precio;
+				precioTotal = cantidad * precio;				
 
 				System.out.println("Codigo producto: " + codigo + "	Nombre del producto: " + nombre + "	Cantidad: "
 						+ cantidad + "	Precio del producto: " + precio + "	Precio Total: "

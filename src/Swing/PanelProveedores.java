@@ -105,25 +105,29 @@ public class PanelProveedores extends JPanel {
 		btnEliminar.setBounds(157, 319, 520, 62);
 		panel.add(btnEliminar);
 		
-		JButton btnConsultar = new JButton("CONSULTAR DATOS PROVEEDOR");
-		btnConsultar.addMouseListener(new MouseAdapter() {
+		JButton btnConsultarProveedor = new JButton("CONSULTAR DATOS PROVEEDOR");
+		btnConsultarProveedor.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseEntered(MouseEvent e) {
-				btnConsultar.setBackground(new Color(255, 215, 210));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				btnConsultar.setBackground(new Color(255, 228, 225));
+			public void mouseClicked(MouseEvent e) {
+				PanelMostrarProv p1= new PanelMostrarProv();
+				p1.setSize(814,711);
+				p1.setLocation(0,0);
+				
+				panel.removeAll();
+				panel.setLayout(null);
+				panel.add(p1);
+				panel.revalidate();
+				panel.repaint();
 			}
 		});
-		btnConsultar.setFont(new Font("Verdana", Font.BOLD, 15));
-		btnConsultar.setFocusPainted(false);
-		btnConsultar.setBorderPainted(false);
-		btnConsultar.setBorder(null);
-		btnConsultar.setBackground(new Color(255, 228, 225));
-		btnConsultar.setBounds(157, 411, 520, 62);
-		panel.add(btnConsultar);
-		
+		btnConsultarProveedor.setFont(new Font("Verdana", Font.BOLD, 15));
+		btnConsultarProveedor.setFocusPainted(false);
+		btnConsultarProveedor.setBorderPainted(false);
+		btnConsultarProveedor.setBorder(null);
+		btnConsultarProveedor.setBackground(new Color(255, 228, 225));
+		btnConsultarProveedor.setBounds(157, 410, 520, 62);
+		panel.add(btnConsultarProveedor);
+	
 
 	}
 

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -12,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
+import Milki.Empresa;
 
 public class PanelEliminarProv extends JPanel {
 	
@@ -28,6 +31,12 @@ public class PanelEliminarProv extends JPanel {
 		panel.setBounds(0, 0, 818, 711);
 		add(panel);
 		panel.setLayout(null);
+		
+		        JSeparator sep1 = new JSeparator();
+		        sep1.setFont(new Font("Dialog", Font.BOLD, 12));
+		        sep1.setForeground(new Color(255, 102, 153));
+		        sep1.setBounds(267, 409, 264, 2);
+		        panel.add(sep1);
 
 		JPanel cabecera = new JPanel();
 		cabecera.setBackground(new Color(255, 153, 153));
@@ -35,71 +44,82 @@ public class PanelEliminarProv extends JPanel {
 		panel.add(cabecera);
 		cabecera.setLayout(null);
 
-		JLabel lblCabecera = new JLabel("ELIMINAR PROVEEDOR");
+		JLabel lblCabecera = new JLabel("ELIMAR PROVEEDOR");
 		lblCabecera.setFont(new Font("Verdana", Font.BOLD, 30));
 		lblCabecera.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCabecera.setForeground(Color.WHITE);
-		lblCabecera.setBounds(227, 28, 410, 51);
+		lblCabecera.setBounds(227, 28, 363, 51);
 		cabecera.add(lblCabecera);
 		
 		JLabel lblResultado = new JLabel();
 		lblResultado.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 18));
-        lblResultado.setBounds(248, 481, 306, 71);
+        lblResultado.setBounds(210, 481, 398, 71);
         panel.add(lblResultado);
         
 
-		JButton btnCrear = new JButton("ELIMINAR");
+		JButton btnBaja = new JButton("ELIMINAR");
 	
-		btnCrear.addMouseListener(new MouseAdapter() {
+		btnBaja.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				btnCrear.setBackground(new Color(255, 215, 210));
+				btnBaja.setBackground(new Color(255, 215, 210));
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				btnCrear.setBackground(new Color(255, 228, 225));
+				btnBaja.setBackground(new Color(255, 228, 225));
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				lblResultado.setText("¡CLIENTE DADO DE BAJA CON EXITO!");
+				String codigo;
+				codigo=txtNombre.getText();
+				try {
+					if(Empresa.borrarPersona(codigo)==true) {
+						lblResultado.setText("¡PROVEEDOR ELIMINADO CON EXITO!");
+					}
+					else {
+						lblResultado.setText("¡ERROR, DATOS INCORRECTOS O CLIENTE ELIMINADO!");
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				txtNombre.setFont(new Font("Verdana", Font.ITALIC, 18));
+				txtNombre.setText("Codigo Proveedor");
+				txtNombre.setForeground(new Color(255, 182, 193));
 			
 			}
 		});
-		btnCrear.setFont(new Font("Verdana", Font.BOLD, 15));
-		btnCrear.setFocusPainted(false);
-		btnCrear.setBorder(null);
-		btnCrear.setBackground(new Color(255, 228, 225));
-		btnCrear.setBounds(143, 608, 520, 62);
-		panel.add(btnCrear);
+		btnBaja.setFont(new Font("Verdana", Font.BOLD, 15));
+		btnBaja.setFocusPainted(false);
+		btnBaja.setBorder(null);
+		btnBaja.setBackground(new Color(255, 228, 225));
+		btnBaja.setBounds(143, 608, 520, 62);
+		panel.add(btnBaja);
 
 		txtNombre = new JTextField();
 		txtNombre.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (txtNombre.getText().equals("Codigo Cliente/Proveedor")) {
+				if (txtNombre.getText().equals("Codigo Proveedor")) {
 					txtNombre.setText("");
 					txtNombre.setForeground(Color.black);
 				}
+				
 			}
 		});
         txtNombre.setBackground(new Color(255, 240, 245));
         txtNombre.setFont(new Font("Verdana", Font.ITALIC, 18));
-        txtNombre.setText("Codigo Cliente/Proveedor");
+        txtNombre.setText("Codigo Proveedor");
         txtNombre.setForeground(new Color(255, 182, 193));
         txtNombre.setBorder(null);
         txtNombre.setBounds(267, 373, 263, 37);
         panel.add(txtNombre);
         txtNombre.setColumns(10);
-
-        JSeparator sep1 = new JSeparator();
-        sep1.setFont(new Font("Dialog", Font.BOLD, 12));
-        sep1.setForeground(new Color(255, 102, 153));
-        sep1.setBounds(266, 418, 264, 2);
-        panel.add(sep1);
         
         JLabel lblLogo = new JLabel("");
-        lblLogo.setIcon(new ImageIcon(PanelAltaPedido.class.getResource("/imagenes/PAQUETE.PNG.png")));
-        lblLogo.setBounds(312, 126, 163, 236);
+        lblLogo.setIcon(new ImageIcon(PanelEliminarCliente.class.getResource("/imagenes/Milki-Triste.png")));
+        lblLogo.setBounds(311, 199, 163, 163);
         panel.add(lblLogo);
         
       
