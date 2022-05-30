@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -19,11 +17,10 @@ import Milki.Empresa;
 
 public class PanelRestablecerExistencias extends JPanel {
 	
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
 	private JTextField txtCantidad;
-	/**
-	 * Create the panel.
-	 */
+
 	public PanelRestablecerExistencias() {
 		setLayout(null);
 		JPanel panel = new JPanel();

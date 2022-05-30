@@ -1,11 +1,8 @@
 package Swing.Cliente;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,10 +15,10 @@ import Milki.Empresa;
 
 public class PanelEliminarCliente extends JPanel {
 	
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
-	/**
-	 * Create the panel.
-	 */
+	
+	
 	public PanelEliminarCliente() {
 
 		setLayout(null);

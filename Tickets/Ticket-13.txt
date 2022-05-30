@@ -1,0 +1,12 @@
+***TICKET-13***
+-------------------------------------------------------
+DATOS DEL PEDIDO:
+PEDIDO Nº=13           FECHA DEL PEDIDO=2022-05-30
+-------------------------------------------------------
+DATOS PERSONALES:
+IDENTIFICADOR=CL3      NOMBRE=JUAN
+                       APELLIDOS=ESTEBAN
+-------------------------------------------------------
+PRODUCTOS:
+-------------------------------------------------------
+IMPORTE DEL PEDIDO=0.0

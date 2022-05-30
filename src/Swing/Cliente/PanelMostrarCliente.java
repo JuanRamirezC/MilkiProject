@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -13,20 +11,18 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
 import Milki.Empresa;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
-import javax.swing.JScrollBar;
 
 public class PanelMostrarCliente extends JPanel {
 
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
 	private JTextField textRes;
-	/**
-	 * Create the panel.
-	 */
+
+	
 	public PanelMostrarCliente() {
 
 		setLayout(null);
@@ -115,11 +111,14 @@ public class PanelMostrarCliente extends JPanel {
 		lblLogo.setIcon(new ImageIcon(PanelMostrarCliente.class.getResource("/imagenes/Buscar.png")));
 		lblLogo.setBounds(306, 144, 179, 155);
 		panel.add(lblLogo);
+				
+				JScrollPane scrollPane = new JScrollPane();
+				scrollPane.setBounds(41, 404, 731, 160);
+				panel.add(scrollPane);
 		
 				textRes = new JTextField();
+				scrollPane.setViewportView(textRes);
 				textRes.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 13));
-				textRes.setBounds(41, 404, 731, 160);
-				panel.add(textRes);
 				textRes.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, new Color(255, 204, 255), null, new Color(255, 102, 204), null));
 				textRes.setCaretColor(new Color(255, 204, 255));
 				textRes.setColumns(10);

@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,11 +19,12 @@ import Swing.Cliente.PanelMostrarCliente;
 import javax.swing.JScrollBar;
 
 public class PanelMostrarProv extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
 	private JTextField textRes;
-	/**
-	 * Create the panel.
-	 */
+
+	
 	public PanelMostrarProv() {
 		setLayout(null);
 

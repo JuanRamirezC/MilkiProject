@@ -9,21 +9,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
 
 public class PanelPedidos extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Create the panel.
-	 */
+
 	public PanelPedidos() {
 
 		setLayout(null);
@@ -107,15 +100,44 @@ public class PanelPedidos extends JPanel {
 		btnElim.setBorderPainted(false);
 		btnElim.setBorder(null);
 		btnElim.setBackground(new Color(255, 228, 225));
-		btnElim.setBounds(157, 520, 520, 62);
+		btnElim.setBounds(157, 591, 520, 62);
 		panel.add(btnElim);
 		
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setIcon(new ImageIcon(PanelPedidos.class.getResource("/imagenes/PAQUETE.PNG.png")));
-		lblLogo.setBounds(333, 248, 163, 236);
+		lblLogo.setBounds(333, 319, 163, 236);
 		panel.add(lblLogo);
+		
+		JButton btnFinalizarPedido = new JButton("FINALIZAR PEDIDO");
+		btnFinalizarPedido.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnFinalizarPedido.setBackground(new Color(255, 215, 210));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnFinalizarPedido.setBackground(new Color(255, 228, 225));
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				PanelFinalizarPedido p1= new PanelFinalizarPedido();
+				p1.setSize(814,711);
+				p1.setLocation(0,0);
+
+				panel.removeAll();
+				panel.setLayout(null);
+				panel.add(p1);
+				panel.revalidate();
+				panel.repaint();
+			}
+		});
+		btnFinalizarPedido.setFont(new Font("Verdana", Font.BOLD, 15));
+		btnFinalizarPedido.setFocusPainted(false);
+		btnFinalizarPedido.setBorder(null);
+		btnFinalizarPedido.setBackground(new Color(255, 228, 225));
+		btnFinalizarPedido.setBounds(157, 257, 520, 62);
+		panel.add(btnFinalizarPedido);
 
 
 	}
-
 }

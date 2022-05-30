@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,13 +17,12 @@ import javax.swing.ImageIcon;
 
 public class PanelAñadirProducto extends JPanel {
 
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
 	private JTextField txtCantidad;
 	private JTextField txtMarca;
 	private JTextField txtPrecio;
-	/**
-	 * Create the panel.
-	 */
+
 	public PanelAñadirProducto() {
 
 		setLayout(null);

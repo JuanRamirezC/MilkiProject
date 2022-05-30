@@ -22,9 +22,8 @@ public class PanelAnhadirP extends JPanel {
 	private JTextField txtDni;
 	private JTextField txtNumTelefono;
 	private JTextField txtCodigoPostal;
-	/**
-	 * Create the panel.
-	 */
+	
+	
 	public PanelAnhadirP() {
 		setLayout(null);
 		JPanel panel = new JPanel();

@@ -10,26 +10,19 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.SwingConstants;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import Milki.Empresa;
-
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
 import javax.swing.JButton;
 import java.awt.Cursor;
 import javax.swing.JComboBox;
@@ -42,7 +35,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.Dimension;
-import javax.swing.JScrollBar;
 
 public class FramePedido extends JFrame {
 
@@ -52,14 +44,14 @@ public class FramePedido extends JFrame {
 	private JPanel contentPane;
 	private JTable table;
 	private String per=PanelCrearPedido.codpers; 
+	JLabel lblPrecio2,lblImporte2 ;
 	DefaultTableModel modelo=new DefaultTableModel();
-	private String[] prod_peds = new String[5];
+	ArrayList<Venta>lista=new ArrayList<Venta>();
+	public static JLabel total =new JLabel(); 
 	private static double preciov;
 	private int numero=PanelCrearPedido.num;
-
 	private static int cantidad;
 
-	private double subTotal = 0;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -70,19 +62,14 @@ public class FramePedido extends JFrame {
 					frame = new FramePedido();
 					frame.setVisible(true);
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-
 			}
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 * @throws SQLException 
-	 */
+
+	@SuppressWarnings("rawtypes")
 	public FramePedido() throws SQLException {
 
 
@@ -113,6 +100,9 @@ public class FramePedido extends JFrame {
 		lbldate.setOpaque(true);
 		lbldate.setBounds(551, 24, 87, 26);
 		contentPane.add(lbldate);
+		LocalDate date=LocalDate.now();
+		DateTimeFormatter formatter =DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		lbldate.setText(String.valueOf(date.format(formatter)));
 
 		JLabel lblFecha = new JLabel("Fecha");
 		lblFecha.setOpaque(true);
@@ -146,7 +136,7 @@ public class FramePedido extends JFrame {
 		JLabel lblNumPedido = new JLabel("New label");
 		lblNumPedido.setFont(new Font("Verdana", Font.PLAIN, 11));
 		lblNumPedido.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNumPedido.setBackground(new Color(255, 204, 255));
+		lblNumPedido.setBackground(new Color(255, 204, 204));
 		lblNumPedido.setOpaque(true);
 		lblNumPedido.setBounds(380, 24, 104, 26);
 		contentPane.add(lblNumPedido);
@@ -172,7 +162,7 @@ public class FramePedido extends JFrame {
 		JLabel lblPersona = new JLabel("New label");
 		lblPersona.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPersona.setFont(new Font("Verdana", Font.PLAIN, 11));
-		lblPersona.setBackground(new Color(255, 204, 255));
+		lblPersona.setBackground(new Color(255, 204, 204));
 		lblPersona.setOpaque(true);
 		lblPersona.setBounds(551, 58, 87, 26);
 		contentPane.add(lblPersona);
@@ -183,60 +173,46 @@ public class FramePedido extends JFrame {
 		milki_logo.setBounds(10, 11, 175, 84);
 		contentPane.add(milki_logo);
 
-		JLabel lblSubtotal = new JLabel("SUBTOTAL  ");
-		lblSubtotal.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblSubtotal.setOpaque(true);
-		lblSubtotal.setFont(new Font("Verdana", Font.BOLD, 12));
-		lblSubtotal.setBorder(null);
-		lblSubtotal.setBackground(new Color(255, 255, 255));
-		lblSubtotal.setBounds(448, 471, 87, 26);
-		contentPane.add(lblSubtotal);
-
-		JLabel lblIva = new JLabel("IVA  ");
-		lblIva.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblIva.setOpaque(true);
-		lblIva.setFont(new Font("Verdana", Font.BOLD, 12));
-		lblIva.setBorder(null);
-		lblIva.setBackground(new Color(255, 255, 255));
-		lblIva.setBounds(458, 500, 77, 26);
-		contentPane.add(lblIva);
-
 		JLabel lblTotal = new JLabel("TOTAL");
 		lblTotal.setOpaque(true);
 		lblTotal.setFont(new Font("Verdana", Font.BOLD, 12));
 		lblTotal.setBorder(null);
 		lblTotal.setBackground(new Color(255, 255, 255));
-		lblTotal.setBounds(483, 552, 52, 26);
+		lblTotal.setBounds(483, 460, 52, 26);
 		contentPane.add(lblTotal);
 
-		JLabel subtotal = new JLabel("0.00 \u20AC");
-		subtotal.setHorizontalAlignment(SwingConstants.CENTER);
-		subtotal.setHorizontalTextPosition(SwingConstants.LEADING);
-		subtotal.setFont(new Font("Verdana", Font.PLAIN, 11));
-		subtotal.setOpaque(true);
-		subtotal.setBackground(new Color(255, 240, 245));
-		subtotal.setBounds(545, 471, 93, 26);
-		contentPane.add(subtotal);
-
-		JLabel iva = new JLabel("0.00 \u20AC");
-		iva.setHorizontalAlignment(SwingConstants.CENTER);
-		iva.setHorizontalTextPosition(SwingConstants.LEADING);
-		iva.setFont(new Font("Verdana", Font.PLAIN, 11));
-		iva.setOpaque(true);
-		iva.setBackground(new Color(255, 240, 245));
-		iva.setBounds(545, 501, 93, 26);
-		contentPane.add(iva);
-
-		JLabel total = new JLabel("0.00 \u20AC");
+		total=new JLabel("0.00 \u20AC");
 		total.setHorizontalAlignment(SwingConstants.CENTER);
 		total.setHorizontalTextPosition(SwingConstants.LEADING);
 		total.setFont(new Font("Verdana", Font.PLAIN, 11));
 		total.setOpaque(true);
-		total.setBackground(new Color(255, 255, 224));
-		total.setBounds(545, 553, 93, 26);
+		total.setBackground(new Color(255, 153, 255));
+		total.setBounds(545, 461, 93, 26);
 		contentPane.add(total);
 
 		JButton btnConfirmar = new JButton("CONFIRMAR PEDIDO");
+		btnConfirmar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				;
+				dispose();
+				JOptionPane.showMessageDialog(null, Empresa.confirmarPedido(numero),"CONFIRMACION",
+						JOptionPane.PLAIN_MESSAGE);
+				PanelPedidos pp =new PanelPedidos() ;
+				pp.setVisible(true); //TODO revisar si esto funciona
+
+			}
+		});
+		btnConfirmar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnConfirmar.setBackground(new Color(255, 130, 130));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnConfirmar.setBackground(new Color(255, 153, 153));
+			}
+
+		});
 		btnConfirmar.setFocusPainted(false);
 		btnConfirmar.setFocusable(false);
 		btnConfirmar.setFont(new Font("Verdana", Font.BOLD, 15));
@@ -244,12 +220,12 @@ public class FramePedido extends JFrame {
 		btnConfirmar.setBorder(null);
 		btnConfirmar.setBackground(new Color(255, 153, 153));
 		btnConfirmar.setForeground(new Color(255, 255, 255));
-		btnConfirmar.setBounds(10, 532, 193, 46);
+		btnConfirmar.setBounds(242, 547, 193, 46);
 		contentPane.add(btnConfirmar);
 
 
 
-		JLabel lblPrecio2 = new JLabel("0.00 \u20AC");
+		lblPrecio2 = new JLabel("0.00 \u20AC");
 		lblPrecio2.setOpaque(true);
 		lblPrecio2.setHorizontalAlignment(SwingConstants.LEFT);
 		lblPrecio2.setFont(new Font("Verdana", Font.BOLD, 11));
@@ -258,7 +234,7 @@ public class FramePedido extends JFrame {
 		lblPrecio2.setBounds(385, 136, 77, 26);
 		contentPane.add(lblPrecio2);
 
-		JLabel lblImporte2 = new JLabel("0.00 \u20AC");
+		lblImporte2 = new JLabel("0.00 \u20AC");
 		lblImporte2.setOpaque(true);
 		lblImporte2.setHorizontalAlignment(SwingConstants.LEFT);
 		lblImporte2.setFont(new Font("Verdana", Font.BOLD, 11));
@@ -266,7 +242,7 @@ public class FramePedido extends JFrame {
 		lblImporte2.setBackground(Color.WHITE);
 		lblImporte2.setBounds(385, 173, 77, 26);
 		contentPane.add(lblImporte2);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(255, 153, 153));
 		scrollPane.setBounds(10, 222, 628, 227);
@@ -291,10 +267,11 @@ public class FramePedido extends JFrame {
 		lblresultado.setHorizontalAlignment(SwingConstants.CENTER);
 		lblresultado.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 12));
 		lblresultado.setBackground(Color.WHITE);
-		lblresultado.setBounds(85, 471, 304, 46);
+		lblresultado.setBounds(10, 461, 304, 46);
 		contentPane.add(lblresultado);
 
 		JSpinner spinner = new JSpinner();
+		
 
 		JComboBox comboBox = new JComboBox();
 		comboBox.setBorder(null);
@@ -314,6 +291,8 @@ public class FramePedido extends JFrame {
 				calcularPrecio(comboBox,per,spinner,lblPrecio2,lblImporte2);
 			}
 		});
+		
+		
 		spinner.setModel(new SpinnerNumberModel(1, 1, 9999, 1));
 		spinner.setBackground(new Color(255, 255, 224));
 		spinner.setFont(new Font("Verdana", Font.PLAIN, 11));
@@ -334,32 +313,36 @@ public class FramePedido extends JFrame {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
+
+				Venta venta=new Venta();
 				String nombreProd=comboBox.getSelectedItem().toString();
 				String[]codigos=nombreProd.split("-");
 				String codigo=codigos[0];
 				String nombreP=codigos[1];
-				prod_peds[0]=codigo;
-				prod_peds[1]=nombreP;
-				prod_peds[2]=String.valueOf(cantidad) ;
-				prod_peds[3]=String.valueOf(preciov+" €") ;
-				prod_peds[4]=String.valueOf((preciov*cantidad)+" €");
-				actualizarTabla();
-				try {
-					calcularTotal(subtotal,total,iva);
-				} catch (SQLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
 
-				Empresa.anhadirProducto_Pedido(numero, Integer.parseInt(codigo), cantidad);
+				venta.setCodigo_prod(Integer.valueOf(codigo));
+				venta.setNombre(nombreP);
+				venta.setCantidad(cantidad);
+				venta.setPrecio(preciov);
+				venta.setImporte(preciov*cantidad);
+
+				if(!buscarVenta(venta, "AÑADIR")) {
+					lista.add(venta);
+					lblresultado.setText(Empresa.anhadirProducto_Pedido(numero, venta.getCodigo_prod(), venta.getCantidad()));
+				}
 				
+				borrarVenta(comboBox,spinner);
+				
+				actualizarTabla();
+				borrarVenta(comboBox,spinner);
+
 			}
 		});
 		btnAgregar.setForeground(new Color(255, 255, 255));
 		btnAgregar.setBorder(null);
-		btnAgregar.setBackground(new Color(51, 204, 153));
+		btnAgregar.setBackground(new Color(255, 153, 204));
 		btnAgregar.setFont(new Font("Verdana", Font.BOLD, 30));
-		btnAgregar.setBounds(508, 136, 52, 46);
+		btnAgregar.setBounds(524, 165, 52, 46);
 		contentPane.add(btnAgregar);
 
 
@@ -373,41 +356,126 @@ public class FramePedido extends JFrame {
 		modelo.addColumn("PRECIO UNIT");
 		modelo.addColumn("IMPORTE");
 		calcularPrecio(comboBox,per,spinner,lblPrecio2,lblImporte2);
-		calcularTotal(subtotal,total,iva);
+
+		//TODO allison 
+
+		JButton btnAgregar_1 = new JButton("-");
+		btnAgregar_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnAgregar.setBackground(new Color(54, 220, 170));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnAgregar.setBackground(new Color(51, 204, 153));
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Venta venta=new Venta();
+				String nombreProd=comboBox.getSelectedItem().toString();
+				String[]codigos=nombreProd.split("-");
+				String codigo=codigos[0];
+				String nombreP=codigos[1];
+
+				venta.setCodigo_prod(Integer.valueOf(codigo));
+				venta.setNombre(nombreP);
+				venta.setCantidad(cantidad);
+				venta.setPrecio(preciov);
+				venta.setImporte(preciov*cantidad);
+
+				buscarVenta(venta,"RESTAR") ;
+
+				borrarVenta(comboBox,spinner);
+				
+				//TODO PUEDE QUE ESTO VAYTA EN EL METODO DE ABAJO, TE LO SEÑALO PA QUE NO TE CABREAS o "TE PONGAS NERVIOSO"
+				lblresultado.setText(Empresa.modificarCantidadProd_Pedido(numero, venta.getCodigo_prod(), venta.getCantidad()));
+				
+
+				actualizarTabla();
+				borrarVenta(comboBox,spinner);
+			}
+
+		});
+		btnAgregar_1.setForeground(Color.WHITE);
+		btnAgregar_1.setFont(new Font("Verdana", Font.BOLD, 30));
+		btnAgregar_1.setFocusable(false);
+		btnAgregar_1.setBorder(null);
+		btnAgregar_1.setBackground(new Color(204, 204, 255));
+		btnAgregar_1.setBounds(586, 165, 52, 46);
+		contentPane.add(btnAgregar_1);
 	}
 
-	public void borrarVenta() {
+	public boolean buscarVenta(Venta nueva, String tipo) {
+
+		for (Venta venta : lista) {
+			if(venta.getCodigo_prod()==nueva.getCodigo_prod()) {
+				if(tipo.equals("AÑADIR")) {
+					int nuevaCant=venta.getCantidad()+nueva.getCantidad();
+					venta.setCantidad(nuevaCant);
+					venta.setImporte(venta.getPrecio()*nuevaCant);
+					//ACTUALIZAR CANTIDAD A MAS PROD
+					return true;
+				}
+				else {
+					int nuevaCant=venta.getCantidad()-nueva.getCantidad();
+					if(nuevaCant>0) {
+						venta.setCantidad(nuevaCant);
+						venta.setImporte(venta.getPrecio()*nuevaCant);
+						//ACTUALIZAR A MENOS
+						return true;
+					}
+					else {
+						lista.remove(venta);
+						//BORRAR PROD
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void borrarVenta( JComboBox comboBox,JSpinner spinner) {
 		preciov=0;
 		cantidad=0;
+		comboBox.setSelectedIndex(0);
+		spinner.setValue(1);
+		calcularPrecio(comboBox,per,spinner,lblPrecio2,lblImporte2);
 	}
 
 	public void actualizarTabla() {
-		modelo.addRow(prod_peds);
+		while(modelo.getRowCount()>0) {
+			modelo.removeRow(0);
+		}
+		double tot=0;
+		for (Venta venta : lista) {
+			Object x[]= new Object[5];
+			x[0]=venta.getCodigo_prod();
+			x[1]=venta.getNombre();
+			x[2]=venta.getCantidad();
+			x[3]=euro(venta.getPrecio());
+			x[4]=euro(venta.getImporte());
+			tot+=venta.getImporte();
+			modelo.addRow(x);
+		}
+		total.setText(euro(tot));
+		
+		Empresa.fijarTotal(numero,tot);
 		table.setModel(modelo);
 	}
 
-	
-	public void calcularTotal(JLabel subtotal, JLabel total, JLabel iva) throws SQLException {
-		double importe;
-		Statement st = Empresa.connection.createStatement();
-		ResultSet rs;
-		
-		rs = st.executeQuery(
-				"select importe_total from pedido where num_pedido="+numero);
-		if (rs.next()) {
-			importe=rs.getDouble("importe_total");
-			subtotal.setText(String.valueOf(importe+" €"));
-			iva.setText("--");
-			total.setText(String.valueOf(importe+" €"));
-		}
-		
-//		Empresa.calcularImporte();
+
+	public static String euro(Double canti) {
+		return Math.round(canti*100.0)/100.0 + " €";
 	}
-	//Allison
+
+
 	@SuppressWarnings("rawtypes")
 	public static void calcularPrecio(JComboBox cbox, String cod, JSpinner spinner, JLabel precio, JLabel importe ) {
 
-		if(Empresa.conectar("milki", "milki")==true) {
+		Empresa.conectar("milki", "milki"); 
 
 			String nombreProd;
 			String codigo;
@@ -429,12 +497,9 @@ public class FramePedido extends JFrame {
 						preciov=rs.getDouble("precio_venta");
 						cantidad=Integer.parseInt(spinner.getValue().toString()) ;
 
-						precio.setText(String.valueOf(preciov+" € "));
-						importe.setText(String.valueOf((preciov*cantidad)+" € ") );
-
+						precio.setText(euro(preciov));
+						importe.setText(euro(preciov*cantidad));
 					}
-
-
 				}
 				else {
 					Statement st = Empresa.connection.createStatement();
@@ -448,16 +513,14 @@ public class FramePedido extends JFrame {
 						preciov=rs.getDouble("precio_compra");
 						cantidad=Integer.parseInt(spinner.getValue().toString()) ;
 
-						precio.setText(String.valueOf(preciov+" € "));
-						importe.setText(String.valueOf((preciov*cantidad)+" € ") );
-
+						precio.setText(euro(preciov));
+						importe.setText(euro(preciov*cantidad));
 					}
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-	}
 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -466,7 +529,7 @@ public class FramePedido extends JFrame {
 		String pro;
 		if(Empresa.conectar("milki", "milki")==true) {
 			try {
-
+				
 				Statement st=Empresa.connection.createStatement();
 				ResultSet rs = st.executeQuery("select codigo_prod, nombre from producto order by codigo_prod");
 				while (rs.next()){
@@ -481,7 +544,6 @@ public class FramePedido extends JFrame {
 				JOptionPane.showMessageDialog(null,"ERROR AL CONSULTAR DATOS", "ERROR",
 						JOptionPane.ERROR_MESSAGE);
 			}
-		};
-
+		}
 	}
 }

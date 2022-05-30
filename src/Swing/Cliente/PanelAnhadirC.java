@@ -22,9 +22,7 @@ public class PanelAnhadirC extends JPanel {
 	private JTextField txtNumTelefono;
 	private JTextField txtCodigoPostal;
 
-	/**
-	 * Create the panel.
-	 */
+	
 	public PanelAnhadirC() {
 
 		setLayout(null);
@@ -84,14 +82,14 @@ public class PanelAnhadirC extends JPanel {
 		txtNombre.setText("Nombre");
 		txtNombre.setForeground(new Color(255, 182, 193));
 		txtNombre.setBorder(null);
-		txtNombre.setBounds(72, 253, 263, 37);
+		txtNombre.setBounds(429, 254, 318, 37);
 		panel.add(txtNombre);
 		txtNombre.setColumns(10);
 
 		JSeparator sep1 = new JSeparator();
 		sep1.setFont(new Font("Dialog", Font.BOLD, 12));
 		sep1.setForeground(new Color(255, 102, 153));
-		sep1.setBounds(71, 292, 264, 2);
+		sep1.setBounds(71, 292, 180, 2);
 		panel.add(sep1);
 
 		txtApellidos = new JTextField();
@@ -225,13 +223,13 @@ public class PanelAnhadirC extends JPanel {
 		txtDni.setFont(new Font("Verdana", Font.ITALIC, 18));
 		txtDni.setColumns(10);
 		txtDni.setBorder(null);
-		txtDni.setBounds(520, 253, 227, 37);
+		txtDni.setBounds(71, 254, 180, 37);
 		panel.add(txtDni);
 
 		JSeparator sep2 = new JSeparator();
 		sep2.setForeground(new Color(255, 102, 153));
 		sep2.setFont(new Font("Dialog", Font.BOLD, 12));
-		sep2.setBounds(520, 292, 227, 2);
+		sep2.setBounds(429, 292, 318, 2);
 		panel.add(sep2);
 
 		txtNumTelefono = new JTextField();

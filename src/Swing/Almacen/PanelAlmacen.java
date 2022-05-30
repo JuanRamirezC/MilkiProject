@@ -14,14 +14,9 @@ import javax.swing.JLabel;
 
 public class PanelAlmacen extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Create the panel.
-	 */
+
 	public PanelAlmacen() {
 
 setLayout(null);

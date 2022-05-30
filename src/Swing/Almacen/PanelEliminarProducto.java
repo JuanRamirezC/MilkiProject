@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,10 +16,10 @@ import javax.swing.SwingConstants;
 import Milki.Empresa;
 
 public class PanelEliminarProducto extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
-	/**
-	 * Create the panel.
-	 */
+
 	public PanelEliminarProducto() {
 		setLayout(null);
 		JPanel panel = new JPanel();
@@ -33,7 +31,7 @@ public class PanelEliminarProducto extends JPanel {
 		JSeparator sep1 = new JSeparator();
 		sep1.setFont(new Font("Dialog", Font.BOLD, 12));
 		sep1.setForeground(new Color(255, 102, 153));
-		sep1.setBounds(345, 422, 90, 2);
+		sep1.setBounds(322, 422, 156, 2);
 		panel.add(sep1);
 
 		JPanel cabecera = new JPanel();
@@ -61,6 +59,14 @@ public class PanelEliminarProducto extends JPanel {
 		btnEliminar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnEliminar.addMouseListener(new MouseAdapter() {
 			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnEliminar.setBackground(new Color(255, 204, 204));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnEliminar.setBackground(new Color(255, 153, 153));
+			}
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(!txtNombre.getText().isEmpty()) {
 					Empresa.borrarProducto(Integer.parseInt(txtNombre.getText()));
@@ -79,12 +85,12 @@ public class PanelEliminarProducto extends JPanel {
 		btnEliminar.setBorderPainted(false);
 		btnEliminar.setBorder(null);
 		btnEliminar.setBackground(new Color(255, 153, 153));
-		btnEliminar.setBounds(322, 575, 142, 42);
+		btnEliminar.setBounds(322, 577, 156, 42);
 		panel.add(btnEliminar);
 
 		JLabel lblNewLabel_1 = new JLabel("");
 		lblNewLabel_1.setIcon(new ImageIcon(PanelEliminarProducto.class.getResource("/imagenes/YOGURT-Triste.png")));
-		lblNewLabel_1.setBounds(308, 160, 156, 170);
+		lblNewLabel_1.setBounds(322, 184, 156, 170);
 		panel.add(lblNewLabel_1);
 		
 				txtNombre = new JTextField();
@@ -103,7 +109,7 @@ public class PanelEliminarProducto extends JPanel {
 				txtNombre.setText("Codigo");
 				txtNombre.setForeground(new Color(255, 182, 193));
 				txtNombre.setBorder(null);
-				txtNombre.setBounds(345, 387, 90, 37);
+				txtNombre.setBounds(322, 385, 156, 37);
 				panel.add(txtNombre);
 				txtNombre.setColumns(10);
 

@@ -18,15 +18,9 @@ import java.awt.event.MouseEvent;
 
 public class Inicio extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel FondoInicio;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -40,9 +34,6 @@ public class Inicio extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 
 	public Inicio() {
 		setResizable(false);

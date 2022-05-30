@@ -24,15 +24,9 @@ import javax.swing.ImageIcon;
 
 public class Principal extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -46,9 +40,7 @@ public class Principal extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
+
 	public Principal() {
 		
 		setResizable(false);
@@ -216,6 +208,30 @@ public class Principal extends JFrame {
 		lblNewLabel_1.setIcon(new ImageIcon(Principal.class.getResource("/imagenes/milki_logopeque\u00F1o-removebg-preview.png")));
 		lblNewLabel_1.setBounds(33, 11, 156, 170);
 		barra.add(lblNewLabel_1);
+		
+		JButton btonSalir = new JButton("SALIR");
+		btonSalir.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btonSalir.setBackground(new Color(209, 126, 209));
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btonSalir.setBackground(new Color(221, 160, 221));
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setVisible(false);
+				dispose();
+			}
+		});
+		btonSalir.setBorder(null);
+		btonSalir.setBackground(new Color(221, 160, 221));
+		btonSalir.setFont(new Font("Verdana", Font.BOLD, 12));
+		btonSalir.setBounds(48, 634, 122, 37);
+		barra.add(btonSalir);
 		
 		
 		

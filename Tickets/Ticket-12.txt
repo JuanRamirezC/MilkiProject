@@ -1,0 +1,20 @@
+***TICKET-12***
+-------------------------------------------------------
+DATOS DEL PEDIDO:
+PEDIDO Nº=12           FECHA DEL PEDIDO=2022-05-30
+-------------------------------------------------------
+DATOS PERSONALES:
+IDENTIFICADOR=CL3      NOMBRE=JUAN
+                       APELLIDOS=ESTEBAN
+-------------------------------------------------------
+PRODUCTOS:
+-------------------------------------------------------
+    IDENTIFICADOR DEL PRODUCTO=3
+    NOMBRE=Yogur
+    CANTIDAD=85    PRECIO UNITARIO=1    PRECIO TOTAL=132
+-------------------------------------------------------
+    IDENTIFICADOR DEL PRODUCTO=5
+    NOMBRE=Helado
+    CANTIDAD=128    PRECIO UNITARIO=14    PRECIO TOTAL=1843
+-------------------------------------------------------
+IMPORTE DEL PEDIDO=167.4

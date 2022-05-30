@@ -1,0 +1,16 @@
+***TICKET-14***
+-------------------------------------------------------
+DATOS DEL PEDIDO:
+PEDIDO Nº=14           FECHA DEL PEDIDO=2022-05-30
+-------------------------------------------------------
+DATOS PERSONALES:
+IDENTIFICADOR=CL3      NOMBRE=JUAN
+                       APELLIDOS=ESTEBAN
+-------------------------------------------------------
+PRODUCTOS:
+-------------------------------------------------------
+    IDENTIFICADOR DEL PRODUCTO=1
+    NOMBRE=leche 6L Entera
+    CANTIDAD=228    PRECIO UNITARIO=4    PRECIO TOTAL=1094
+-------------------------------------------------------
+IMPORTE DEL PEDIDO=4.8

@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,14 +14,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import Milki.Empresa;
-import Swing.Almacen.PanelEliminarProducto;
 
 public class PanelEliminarPedido extends JPanel {
 
+	private static final long serialVersionUID = 1L;
 	private JTextField txtNombre;
-	/**
-	 * Create the panel.
-	 */
+
+	
 	public PanelEliminarPedido() {
 		setLayout(null);
 		JPanel panel = new JPanel();
